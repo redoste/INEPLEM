@@ -1,4 +1,4 @@
-NEPLEM
+INEPLEM
 =======
 
 **INEPLEM** (Italc Ne sEra PLus dE ce Monde) est un service Windows temporaire remplaçant **icas** (Italc Client Service) et installable via un périphérique bootable.
