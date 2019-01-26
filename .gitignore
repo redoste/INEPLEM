@@ -1,0 +1,5 @@
+/linux-loader/downloads/*
+/linux-loader/sources/*
+/linux-loader/rootfs/*
+/linux-loader/drive/*
+/linux-loader/drive.img

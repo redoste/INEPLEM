@@ -1,0 +1,41 @@
+glibc_ver="2.28"
+glibc_uri="https://ftp.gnu.org/gnu/glibc/glibc-$glibc_ver.tar.gz"
+glibc_sha256="f318d6e3f1f4ed0b74d2832ac4f491d0fb928e451c9eda594cbf1c3bee7af47c"
+glibc_tar="downloads/glibc-$glibc_ver.tar.gz"
+glibc_source="sources/glibc-$glibc_ver"
+
+function glibc_download(){
+	echo "DOWNLOAD GLIBC ...."
+	rm $glibc_tar 2>/dev/null
+	rm -r $glibc_source 2>/dev/null
+
+	curl $glibc_uri -o $glibc_tar
+	tar_sha=$(sha256sum $glibc_tar | cut -d " " -f 1)
+	if [ $tar_sha != $glibc_sha256 ]; then
+		echo "Invalid $glibc_tar ! (sha256 mismatch)"
+		exit 1
+	fi
+	tar -xf $glibc_tar -C sources/
+	echo "DOWNLOAD GLIBC DONE"
+}
+
+function glibc_build(){
+	echo "BUILDING GLIBC ...."
+	cd $glibc_source
+	mkdir build
+	cd build
+	./../configure --prefix=/ --enable-shared --host=i686-pc-linux-gnu --disable-crypt --disable-build-nscd
+	make -j 2
+	cd $SCRIPT_FOLDER
+	echo "BUILDING GLIBC DONE"
+}
+
+function glibc_install(){
+	echo "INSTALLING GLIBC ...."
+	mkdir -p rootfs/lib/
+	cp $glibc_source/build/libc.so rootfs/lib/libc.so.6
+	cp $glibc_source/build/elf/ld.so rootfs/lib/ld-linux.so.2
+	cp $glibc_source/build/dlfcn/libdl.so rootfs/lib/libdl.so.2
+	cp $glibc_source/build/nptl/libpthread.so rootfs/lib/libpthread.so.0
+	echo "INSTALLING GLIBC DONE"
+}
