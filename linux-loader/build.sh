@@ -145,19 +145,19 @@ done
 if [ $download_busybox -eq 1 ]; then busybox_download; fi
 if [ $download_chntpw -eq 1 ]; then chntpw_download; fi
 if [ $download_glibc -eq 1 ]; then glibc_download; fi
-if [ $download_linux -eq 1 ]; then : ; fi
+if [ $download_linux -eq 1 ]; then linux_download; fi
 if [ $download_ntfs3g -eq 1 ]; then ntfs3g_download; fi
 if [ $build_busybox -eq 1 ]; then busybox_build; fi
 if [ $build_chntpw -eq 1 ]; then chntpw_build; fi
 if [ $build_glibc -eq 1 ]; then glibc_build; fi
-if [ $build_linux -eq 1 ]; then : ; fi
+if [ $build_linux -eq 1 ]; then linux_build ; fi
 if [ $build_ntfs3g -eq 1 ]; then ntfs3g_build; fi
 if [ $install_busybox -eq 1 ]; then busybox_install; fi
 if [ $install_chntpw -eq 1 ]; then chntpw_install; fi
 if [ $install_glibc -eq 1 ]; then glibc_install; fi
 if [ $install_ntfs3g -eq 1 ]; then ntfs3g_intall; fi
 if [ $install_ineplem -eq 1 ]; then : ; fi
-if [ $install_linux -eq 1 ]; then : ; fi
+if [ $install_linux -eq 1 ]; then linux_install ; fi
 if [ $pack_initramfs -eq 1 ]; then : ; fi
 if [ $install_syslinux -eq 1 ]; then : ; fi
 if [ $pack_drive -eq 1 ]; then : ; fi
