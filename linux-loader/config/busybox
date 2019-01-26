@@ -23,7 +23,7 @@ function busybox_build(){
 	echo "BUILDING BUSYBOX ...."
 	cp config/busybox.config $busybox_source/.config
 	cd $busybox_source
-	make
+	make -j 4
 	make install
 	cd "$SCRIPT_FOLDER"
 	echo "BUILDING BUSYBOX DONE"
