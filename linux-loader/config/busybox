@@ -25,7 +25,7 @@ function busybox_build(){
 	cd $busybox_source
 	make
 	make install
-	cd $SCRIPT_FOLDER
+	cd "$SCRIPT_FOLDER"
 	echo "BUILDING BUSYBOX DONE"
 }
 

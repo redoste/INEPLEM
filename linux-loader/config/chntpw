@@ -25,7 +25,7 @@ function chntpw_build(){
 	cd $chntpw_source
 	make clean
 	make reged
-	cd $SCRIPT_FOLDER
+	cd "$SCRIPT_FOLDER"
 	echo "BUILDING CHNTPW DONE"
 }
 

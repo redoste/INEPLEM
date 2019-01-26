@@ -26,7 +26,7 @@ function glibc_build(){
 	cd build
 	./../configure --prefix=/ --enable-shared --host=i686-pc-linux-gnu --disable-crypt --disable-build-nscd
 	make -j 2
-	cd $SCRIPT_FOLDER
+	cd "$SCRIPT_FOLDER"
 	echo "BUILDING GLIBC DONE"
 }
 

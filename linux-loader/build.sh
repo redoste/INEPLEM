@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 SCRIPT_FOLDER=$(realpath "$(dirname "$0")")
-cd $SCRIPT_FOLDER
+cd "$SCRIPT_FOLDER"
 
 mkdir -p downloads
 mkdir -p drive

@@ -24,7 +24,7 @@ function ntfs3g_build(){
 	cd $ntfs3g_source
 	CFLAGS="-m32" ./configure --prefix=/ --disable-library --enable-shared=no --enable-static=no
 	make
-	cd $SCRIPT_FOLDER
+	cd "$SCRIPT_FOLDER"
 	echo "BUILDING NTFS3G DONE"
 }
 
