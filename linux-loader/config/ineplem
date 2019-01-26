@@ -1,0 +1,7 @@
+function ineplem_install(){
+	echo "INSTALLING INEPLEM ...."
+	cp config/ineplem.init rootfs/init
+	chmod a+x rootfs/init
+	echo "TODO: COPY INEPLEM1.EXE and INEPLEM1.REG"
+	echo "INSTALLING INEPLEM DONE"
+}

@@ -156,7 +156,7 @@ if [ $install_busybox -eq 1 ]; then busybox_install; fi
 if [ $install_chntpw -eq 1 ]; then chntpw_install; fi
 if [ $install_glibc -eq 1 ]; then glibc_install; fi
 if [ $install_ntfs3g -eq 1 ]; then ntfs3g_intall; fi
-if [ $install_ineplem -eq 1 ]; then : ; fi
+if [ $install_ineplem -eq 1 ]; then ineplem_install; fi
 if [ $install_linux -eq 1 ]; then linux_install ; fi
 if [ $pack_initramfs -eq 1 ]; then : ; fi
 if [ $install_syslinux -eq 1 ]; then : ; fi
