@@ -1,0 +1,7 @@
+function pack_initramfs(){
+	echo "PACKING INITRAMFS ...."
+	cd rootfs/
+	find . | cpio -o -H newc | gzip -9 > ../drive/initramfs.img
+	cd "$SCRIPT_FOLDER"
+	echo "PACKING INITRAMFS DONE"
+}
