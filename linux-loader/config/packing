@@ -5,3 +5,20 @@ function pack_initramfs(){
 	cd "$SCRIPT_FOLDER"
 	echo "PACKING INITRAMFS DONE"
 }
+
+function pack_drive(){
+	echo "PACKING DRIVE ...."
+
+	# Create drive.img.tmp who contain FAT32 partition
+	dd if=/dev/zero bs=512 count=129024 of=drive.img.tmp
+	mkfs.vfat -F 32 -n "INEPLEM" drive.img.tmp
+	mcopy -i drive.img.tmp drive/* ::.
+
+	# Add MBR before drive.img.tmp
+	(dd if=/dev/zero bs=512 count=2048 ; cat drive.img.tmp) > drive.img
+	echo "label: dos" | sfdisk drive.img
+	echo ",,c;" | sfdisk drive.img
+
+	rm drive.img.tmp
+	echo "PACKING DRIVE DONE"
+}

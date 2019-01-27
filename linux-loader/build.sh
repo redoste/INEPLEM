@@ -159,6 +159,6 @@ if [ $install_ntfs3g -eq 1 ]; then ntfs3g_intall; fi
 if [ $install_ineplem -eq 1 ]; then ineplem_install; fi
 if [ $install_linux -eq 1 ]; then linux_install ; fi
 if [ $pack_initramfs -eq 1 ]; then pack_initramfs; fi
-if [ $install_syslinux -eq 1 ]; then : ; fi
-if [ $pack_drive -eq 1 ]; then : ; fi
-if [ $install_bootloader -eq 1 ]; then : ; fi
+if [ $install_syslinux -eq 1 ]; then syslinux_install; fi
+if [ $pack_drive -eq 1 ]; then pack_drive; fi
+if [ $install_bootloader -eq 1 ]; then bootloader_install; fi

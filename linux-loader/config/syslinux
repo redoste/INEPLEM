@@ -1,0 +1,19 @@
+function syslinux_install(){
+	echo "INSTALLING SYSLINUX ...."
+	mkdir -p drive/syslinux/
+	mkdir -p drive/EFI/BOOT/
+	cp config/syslinux.config drive/syslinux/syslinux.cfg
+	echo "INCLUDE /syslinux/syslinux.cfg" > drive/EFI/BOOT/syslinux.cfg
+
+	cp /usr/lib/syslinux/efi64/syslinux.efi drive/EFI/BOOT/BOOTX64.EFI
+	cp /usr/lib/syslinux/efi64/ldlinux.e64 drive/EFI/BOOT/ldlinux.e64
+	echo "INSTALLING SYSLINUX DONE"
+}
+
+function bootloader_install(){
+	echo "INSTALLING BOOTLOADER ...."
+	syslinux -d /syslinux/ drive.img --offset=1048576
+	printf "\1" | cat /usr/lib/syslinux/altmbr.bin - | dd bs=440 count=1 conv=notrunc of=drive.img
+	# Last byte of altmbr.bin indicate the partition, here it is 0x01
+	echo "INSTALLING BOOTLOADER DONE"
+}
