@@ -23,12 +23,13 @@ class Pipe(threading.Thread):
                 if not buf: break
                 if self.processing_italccommand:
                     self.process_italc(buf)
-                if buf == b"\x28" and self.is_from_master:
-                    print("ITALC MESSAGE")
-                    self.processing_italccommand = True
-                    self.italccommand = {}
-                if not self.processing_italccommand:
-                    self.dest_socket.send(buf)
+                else:
+                    if buf == b"\x28" and self.is_from_master:
+                        print("ITALC MESSAGE")
+                        self.processing_italccommand = True
+                        self.italccommand = {}
+                    if not self.processing_italccommand:
+                        self.dest_socket.send(buf)
             except e:
                 print("{}".format(e))
                 break
