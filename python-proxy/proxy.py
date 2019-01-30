@@ -33,9 +33,12 @@ class Proxy():
 		# Et on ferme les socket
 		try:
 			self.m2p_conn.close()
-			self.p2v_conn.close()
 		except socket.error or BrokenPipeError:
 			# Peut arriver si l'un des socket est deja fermé
+			pass
+		try:
+			self.p2v_conn.close()
+		except socket.error or BrokenPipeError:
 			pass
 		# Et on informe
 		print("Connection close ID:{}".format(self.proxy_id))
