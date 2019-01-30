@@ -1,6 +1,7 @@
 import socket
 import threading
 import struct
+import binascii
 
 LOCAL_PORT  = 8080
 VNC_PORT    = 8008
@@ -47,25 +48,46 @@ class Pipe(threading.Thread):
             self.source_socket.close()
         except:
             pass
+
+    def struct_eror(self, buf):
+        print("Struct Error")
+        print("{}".format(binascii.hexlify(buf)))
+
     def process_italc(self, buf):
         if "command_length" not in self.italccommand:
-            self.italccommand["command_length"] = struct.unpack(">I", buf)[0]
-            return True
+            try:
+                self.italccommand["command_length"] = struct.unpack(">I", buf)[0]
+            except Exception:
+                self.struct_error(buf)
+            finally:
+                return True
         if "command" not in self.italccommand:
-            self.italccommand["command"] = buf.decode("utf-16-be")
-            return True
+            try:
+                self.italccommand["command"] = buf.decode("utf-16-be")
+            except Exception:
+                self.struct_error(buf)
+            finally:
+                return True
         if "args_length" not in self.italccommand:
-            self.italccommand["args_length"] = struct.unpack(">I", buf)[0]
-            self.italccommand["args_parsed"] = 0
-            self.italccommand["args"] = []
-            if self.italccommand["args_length"] == 0:
-                self.processing_italccommand = False
-                print("{}".format(self.italccommand))
-            return True
+            try:
+                self.italccommand["args_length"] = struct.unpack(">I", buf)[0]
+                self.italccommand["args_parsed"] = 0
+                self.italccommand["args"] = []
+                if self.italccommand["args_length"] == 0:
+                    self.processing_italccommand = False
+                    print("{}".format(self.italccommand))
+            except Exception:
+                self.struct_error(buf)
+            finally:
+                return True
         if len(self.italccommand["args"]) == self.italccommand["args_parsed"]:
-            kl = struct.unpack(">I", buf)[0]
-            self.italccommand["args"].append({"key_length": kl})
-            return True
+            try:
+                kl = struct.unpack(">I", buf)[0]
+                self.italccommand["args"].append({"key_length": kl})
+            except Exception:
+                self.struct_error(buf)
+            finally:
+                return True
         else:
             i = self.italccommand["args_parsed"]
             if "key" not in self.italccommand["args"][i]:
