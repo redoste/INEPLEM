@@ -1,2 +1,2 @@
 HANDLE italcWatchdogThread();
-long unsigned int WINAPI italcWatchdog(LPVOID lpParameter);
+uint32_t WINAPI italcWatchdog(LPVOID lpParameter);

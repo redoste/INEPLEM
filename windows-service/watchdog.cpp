@@ -6,14 +6,14 @@
 
 HANDLE italcWatchdogThread(){
 	// Créer un thread pour italcWatchdog();
-	HANDLE thread = CreateThread(NULL, 0, italcWatchdog, NULL, 0, NULL);
+	HANDLE thread = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE) italcWatchdog, NULL, 0, NULL);
 	return thread;
 }
 
-long unsigned int WINAPI italcWatchdog(LPVOID lpParameter){
+uint32_t WINAPI italcWatchdog(LPVOID lpParameter){
 	SC_HANDLE ServiceControl, ServiceItalc;
 	SERVICE_STATUS ItalcStatus = {};
-	int error;
+	int16_t error;
 	std::string error_name;
 
 	// Service Manager pour lire des infos sur les services

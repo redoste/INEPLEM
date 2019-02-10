@@ -10,7 +10,7 @@
 SERVICE_STATUS_HANDLE serviceStatusHandle;
 uint8_t serviceContinue;
 
-long unsigned int serviceControl(int control){
+uint32_t serviceControl(int16_t control){
 	// Appellée lors de la modification du status du service
 	SERVICE_STATUS serviceStatus = {
 		SERVICE_WIN32_OWN_PROCESS,
