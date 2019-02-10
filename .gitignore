@@ -5,3 +5,7 @@
 /linux-loader/rootfs/*
 /linux-loader/drive/*
 /linux-loader/drive.img
+
+/windows-service/INEPLEM1.debug.exe
+/windows-service/INEPLEM1.release.exe
+/windows-service/obj/*
