@@ -4,6 +4,7 @@
 
 #include "watchdog.h"
 #include "serviceMain.h"
+#include "serviceCore.h"
 
 SERVICE_STATUS_HANDLE serviceStatusHandle; // Handle du service INEPLEM
 uint8_t serviceContinue; // A 1 normalement et passe a 0 lorsque le service doit s'arrêter
@@ -66,9 +67,23 @@ void serviceMain(int argc, char* argv[]){
 		ServiceMain = OpenServiceA(ServiceControl, SERVICE_NAME, SERVICE_ALL_ACCESS);
 		DeleteService(ServiceMain);
 	}
+	else{
+		// Si on appelé avec "-debug" on enregistre serviceCtrlC() pour le Ctrl+C
+		SetConsoleCtrlHandler((PHANDLER_ROUTINE) serviceCtrlC, 1);
+	}
 
 	serviceContinue = 1;
-	HANDLE threadWatchdog = italcWatchdogThread();
+	ServiceCore core;
+	core.start();
 	while(serviceContinue){Sleep(70);}
-	CloseHandle(threadWatchdog);
+	core.stop();
+}
+
+/* serviceCtrlC: Est appelé par Windows lorsque l'on presse Ctrl+C pour arrêter proprement le service
+ * uint32_t dwCtrlType: type d'arrêt
+ * retourne un int16_t indiquant si l'évenement q pu être traiter
+ */
+int16_t serviceCtrlC(uint32_t dwCtrlType){
+	serviceContinue = 0;
+	return 1;
 }

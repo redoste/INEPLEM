@@ -18,7 +18,8 @@ echo on
 g++ -std=c++17 main.cpp -c -o obj/main.o -Wall -Wextra %cflags%
 g++ -std=c++17 watchdog.cpp -c -o obj/watchdog.o -Wall -Wextra %cflags%
 g++ -std=c++17 serviceMain.cpp -c -o obj/serviceMain.o -Wall -Wextra %cflags%
-g++ -std=c++17 obj/main.o obj/watchdog.o obj/serviceMain.o %lflags%
+g++ -std=c++17 serviceCore.cpp -c -o obj/serviceCore.o -Wall -Wextra %cflags%
+g++ -std=c++17 obj/main.o obj/watchdog.o obj/serviceMain.o obj/serviceCore.o %lflags%
 @echo off
 goto end
 
