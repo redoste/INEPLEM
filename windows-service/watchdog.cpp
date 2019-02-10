@@ -4,12 +4,19 @@
 
 #include "watchdog.h"
 
+/* italcWatchdogThread: Créer un thread pour italcWatchdog()
+ * Aucun paramètre
+ * Retourne un HANDLE du thread
+ */
 HANDLE italcWatchdogThread(){
-	// Créer un thread pour italcWatchdog();
 	HANDLE thread = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE) italcWatchdog, NULL, 0, NULL);
 	return thread;
 }
 
+/* italcWatchdog: Stop le service "icas" dès que celui-ci démare.
+ * LPVOID lpParameter: Paramètre pour les thread, il est innutilisé
+ * Retourne un uint32_t: 1 en cas d'erreur, 0 normalement
+ */
 uint32_t WINAPI italcWatchdog(LPVOID lpParameter){
 	SC_HANDLE ServiceControl, ServiceItalc;
 	SERVICE_STATUS ItalcStatus = {};

@@ -5,9 +5,12 @@
 #include "watchdog.h"
 #include "serviceMain.h"
 
-SERVICE_STATUS_HANDLE serviceStatusHandle;
-uint8_t serviceContinue;
+SERVICE_STATUS_HANDLE serviceStatusHandle; // Handle du service INEPLEM
+uint8_t serviceContinue; // A 1 normalement et passe a 0 lorsque le service doit s'arrêter
 
+/* serviceRegister: Enregistre le service au près de Windows pour completer son démarage
+ * Aucun paramètre et aucun retour
+ */
 void serviceRegister(){
 	SERVICE_TABLE_ENTRY serviceTable[2];
 	serviceTable[0].lpServiceName = (char*) SERVICE_NAME;
@@ -17,8 +20,11 @@ void serviceRegister(){
 	StartServiceCtrlDispatcherA(serviceTable);
 }
 
+/* serviceControl: Est appelé par Windows lors de la modification du status du service
+ * int16_t control: Nouveau status
+ * Retourne un uint32_t: 1 en cas d'erreur, 0 normalement
+ */
 uint32_t serviceControl(int16_t control){
-	// Appellée lors de la modification du status du service
 	SERVICE_STATUS serviceStatus = {
 		SERVICE_WIN32_OWN_PROCESS,
 		SERVICE_RUNNING,
@@ -38,8 +44,11 @@ uint32_t serviceControl(int16_t control){
 	return 0;
 }
 
+/* serviceMain: Est appelé par Windows lorsque le service doit démarrer
+ * int argc, char* argv[]: Arguments du service
+ * Aucun retrour
+ */
 void serviceMain(int argc, char* argv[]){
-	// Appellée au main du service
 	// Initialise tous ces trucs sauf si on est appelé avec "-debug"
 	if(!(argc == 2 && (strcmp(argv[1], "-debug") == 0))){
 		serviceStatusHandle = RegisterServiceCtrlHandlerExA(SERVICE_NAME, (LPHANDLER_FUNCTION_EX) serviceControl, NULL);
