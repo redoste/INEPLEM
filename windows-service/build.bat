@@ -17,7 +17,8 @@ mkdir obj 2>nul
 echo on
 g++ -std=c++17 main.cpp -c -o obj/main.o -Wall -Wextra %cflags%
 g++ -std=c++17 watchdog.cpp -c -o obj/watchdog.o -Wall -Wextra %cflags%
-g++ -std=c++17 obj/main.o obj/watchdog.o %lflags%
+g++ -std=c++17 serviceMain.cpp -c -o obj/serviceMain.o -Wall -Wextra %cflags%
+g++ -std=c++17 obj/main.o obj/watchdog.o obj/serviceMain.o %lflags%
 @echo off
 goto end
 
