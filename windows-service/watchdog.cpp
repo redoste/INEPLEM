@@ -22,7 +22,7 @@ uint32_t WINAPI italcWatchdog(LPVOID lpParameter){
 		error = GetLastError();
 		if(error == ERROR_ACCESS_DENIED) error_name = std::string("ERROR_ACCESS_DENIED");
 		else error_name = std::string("UNKNOWN ERROR");
-		std::cout << "[WATCHDOG] Unable to open ServiceControl: " << error_name << std::endl;
+		std::cerr << "[WATCHDOG] Unable to open ServiceControl: " << error_name << std::endl;
 		return 1;
 	}
 	std::cout << "[WATCHDOG] ServiceControl opened." << std::endl;
@@ -35,7 +35,7 @@ uint32_t WINAPI italcWatchdog(LPVOID lpParameter){
 		else if(error == ERROR_INVALID_NAME) error_name = std::string("ERROR_INVALID_NAME");
 		else if(error == ERROR_SERVICE_DOES_NOT_EXIST) error_name = std::string("ERROR_SERVICE_DOES_NOT_EXIST");
 		else error_name = std::string("UNKNOWN ERROR");
-		std::cout << "[WATCHDOG] Unable to open ServiceItalc: " << error_name << std::endl;
+		std::cerr << "[WATCHDOG] Unable to open ServiceItalc: " << error_name << std::endl;
 		return 1;
 	}
 	std::cout << "[WATCHDOG] ServiceItalc opened." << std::endl;
@@ -45,7 +45,7 @@ uint32_t WINAPI italcWatchdog(LPVOID lpParameter){
 		error = QueryServiceStatus(ServiceItalc, &ItalcStatus);
 		if(!error){
 			error = GetLastError();
-			std::cout << "[WATCHDOG] Unable to get italc status: UNKNOWN ERROR ("<< error << ")" << std::endl;
+			std::cerr << "[WATCHDOG] Unable to get italc status: UNKNOWN ERROR ("<< error << ")" << std::endl;
 			return 1;
 		}
 
@@ -66,7 +66,7 @@ uint32_t WINAPI italcWatchdog(LPVOID lpParameter){
 					error = GetLastError();
 					if(error == ERROR_DEPENDENT_SERVICES_RUNNING) error_name = std::string("ERROR_DEPENDENT_SERVICES_RUNNING");
 					else error_name = std::string("UNKNOWN ERROR");
-					std::cout << "[WATCHDOG] Unable to stop italc: " << error_name << " (" << error << ")" << std::endl;
+					std::cerr << "[WATCHDOG] Unable to stop italc: " << error_name << " (" << error << ")" << std::endl;
 				}
 				else{
 					std::cout << "[WATCHDOG] Italc is stopping..." << std::endl;
