@@ -5,6 +5,8 @@
 #include <string>
 #include <cstdint>
 
+#include "vncProxy.h"
+
 #define VNC_MSAUTH 0x71
 #define VNC_NONEAUTH 0x01
 
@@ -31,6 +33,8 @@ class ServiceCore{
 		uint8_t m_italcAuthresponse;
 		uint8_t m_italcSleep;
 		SOCKET m_italcListeningSocket;
+
+		VncProxy* m_vncProxy;
 };
 
 #endif

