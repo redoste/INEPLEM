@@ -3,18 +3,19 @@
 #include <string>
 
 #include "watchdog.h"
+#include "serviceCore.h"
 
 /* italcWatchdogThread: Créer un thread pour italcWatchdog()
- * Aucun paramètre
+ * ServiceCore *service: pointeur vers le ServiceCore
  * Retourne un HANDLE du thread
  */
-HANDLE italcWatchdogThread(){
-	HANDLE thread = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE) italcWatchdog, NULL, 0, NULL);
+HANDLE italcWatchdogThread(ServiceCore *service){
+	HANDLE thread = CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE) italcWatchdog, (LPVOID) service, 0, NULL);
 	return thread;
 }
 
 /* italcWatchdog: Stop le service "icas" dès que celui-ci démare.
- * LPVOID lpParameter: Paramètre pour les thread, il est innutilisé
+ * LPVOID lpParameter: Paramètre pour les thread, il est utilisé comme pointeur vers ServiceCore
  * Retourne un uint32_t: 1 en cas d'erreur, 0 normalement
  */
 uint32_t WINAPI italcWatchdog(LPVOID lpParameter){
@@ -22,6 +23,7 @@ uint32_t WINAPI italcWatchdog(LPVOID lpParameter){
 	SERVICE_STATUS ItalcStatus = {};
 	int16_t error;
 	std::string error_name;
+	ServiceCore *service = (ServiceCore*) lpParameter;
 
 	// Service Manager pour lire des infos sur les services
 	ServiceControl = OpenSCManagerA(NULL, NULL, GENERIC_READ);
@@ -30,6 +32,7 @@ uint32_t WINAPI italcWatchdog(LPVOID lpParameter){
 		if(error == ERROR_ACCESS_DENIED) error_name = std::string("ERROR_ACCESS_DENIED");
 		else error_name = std::string("UNKNOWN ERROR");
 		std::cerr << "[WATCHDOG] Unable to open ServiceControl: " << error_name << std::endl;
+		service->kill();
 		return 1;
 	}
 	std::cout << "[WATCHDOG] ServiceControl opened." << std::endl;
@@ -43,6 +46,7 @@ uint32_t WINAPI italcWatchdog(LPVOID lpParameter){
 		else if(error == ERROR_SERVICE_DOES_NOT_EXIST) error_name = std::string("ERROR_SERVICE_DOES_NOT_EXIST");
 		else error_name = std::string("UNKNOWN ERROR");
 		std::cerr << "[WATCHDOG] Unable to open ServiceItalc: " << error_name << std::endl;
+		service->kill();
 		return 1;
 	}
 	std::cout << "[WATCHDOG] ServiceItalc opened." << std::endl;
@@ -53,14 +57,19 @@ uint32_t WINAPI italcWatchdog(LPVOID lpParameter){
 		if(!error){
 			error = GetLastError();
 			std::cerr << "[WATCHDOG] Unable to get italc status: UNKNOWN ERROR ("<< error << ")" << std::endl;
+			service->kill();
 			return 1;
 		}
 
 		switch(ItalcStatus.dwCurrentState){
-			// Il est arrêté, on Sleep 1 seconde
+			// Il est arrêté, on Sleep 1 seconde et on le marque comme arrêté au près du ServiceControl
 			case SERVICE_STOPPED:
-			case SERVICE_STOP_PENDING:
+				service->italcSleep();
 				Sleep(1000);
+				break;
+			// Il est en train de s'arrêter, on Sleep 250ms
+			case SERVICE_STOP_PENDING:
+				Sleep(250);
 				break;
 			// Il tourne ou s'aprète a démarrer
 			case SERVICE_RUNNING:

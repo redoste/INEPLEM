@@ -4,6 +4,8 @@
 #include <Windows.h>
 #include <cstdint>
 
-HANDLE italcWatchdogThread();
+#include "serviceCore.h"
+
+HANDLE italcWatchdogThread(ServiceCore *service);
 uint32_t WINAPI italcWatchdog(LPVOID lpParameter);
 #endif

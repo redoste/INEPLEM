@@ -84,6 +84,9 @@ void serviceMain(int argc, char* argv[]){
  * retourne un int16_t indiquant si l'évenement q pu être traiter
  */
 int16_t serviceCtrlC(uint32_t dwCtrlType){
+	if(dwCtrlType == CTRL_LOGOFF_EVENT){
+		return 0;
+	}
 	serviceContinue = 0;
 	return 1;
 }

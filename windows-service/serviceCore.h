@@ -12,6 +12,8 @@
 #define VNC_REJECT 0x01
 #define VNC_ACCEPT 0x02
 
+#define ITALC_PORT 11100
+
 /* Classe ServiceCore: Gère et coordonne les différent composant du service
  */
 class ServiceCore{
@@ -19,12 +21,16 @@ class ServiceCore{
 		ServiceCore();
 		void start();
 		void stop();
+		void italcSleep();
+		void kill();
 	private:
 		HANDLE m_watchdogThread;
 		std::string m_italcUsername;
 		uint8_t m_italcUsernameNull;
 		uint8_t m_italcAuthtype;
 		uint8_t m_italcAuthresponse;
+		uint8_t m_italcSleep;
+		SOCKET m_italcListeningSocket;
 };
 
 #endif
