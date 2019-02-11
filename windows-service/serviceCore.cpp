@@ -1,7 +1,17 @@
 #include <iostream>
+#include <string>
 
 #include "serviceCore.h"
 #include "watchdog.h"
+
+/* ServiceCore::ServiceCore: Constructeur qui initialise toutes les valeurs
+ */
+ServiceCore::ServiceCore(){
+	this->m_italcUsername = std::string("");
+	this->m_italcUsernameNull = 1;
+	this->m_italcAuthtype = VNC_MSAUTH;
+	this->m_italcAuthresponse = VNC_DROP;
+}
 
 /* ServiceCore::start: Démare les différents composant du service
  * Aucun parramètre et aucun retour
