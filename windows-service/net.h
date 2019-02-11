@@ -9,4 +9,5 @@
 uint16_t initWSocket();
 SOCKET createClientConnection(std::string ip, uint16_t port);
 SOCKET createServerConnection(std::string ip, uint16_t port);
+void whitelistFirewall();
 #endif

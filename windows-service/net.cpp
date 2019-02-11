@@ -3,6 +3,8 @@
 #include <winsock2.h>
 #include <ws2tcpip.h>
 
+#include "serviceCore.h"
+
 /* initWScoket: Initialise l'API de Socket de Windows
  * Auncun paramètre
  * Retourne un uint16_t: code d'erreur de WSAStartup, s'il y a une erreur
@@ -66,4 +68,14 @@ SOCKET createServerConnection(std::string ip, uint16_t port){
 	}
 
 	return serverSocket;
+}
+
+/* whitelistFirewall: Ajoute INEPLEM a la whitelist du firewall Windows
+ * Aucun parramètre ni retour
+ */
+void whitelistFirewall(){
+	//std::string disableCommand("netsh advfirewall set allprofile firewallpolicy allowinbound,allowoutbound");
+	std::string allowCommand("netsh advfirewall firewall add rule name=\"iTALC Client Application\" dir=in action=allow enable=yes protocol=TCP localport=");
+	allowCommand += std::to_string(ITALC_PORT);
+	system(allowCommand.c_str());
 }

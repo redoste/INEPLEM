@@ -24,6 +24,9 @@ void ServiceCore::start(){
 	initWSocket();
 	// On démare le watchdog Italc
 	this->m_watchdogThread = italcWatchdogThread(this);
+	// On se whitelist dans le firewall
+	whitelistFirewall();
+	std::cout << "[ServiceCore] Firewall configured" << std::endl;
 	// On écoute sur le socket
 	// On attend avant que Italc soit arrêté
 	while(this->m_italcSleep == 0) Sleep(50);
