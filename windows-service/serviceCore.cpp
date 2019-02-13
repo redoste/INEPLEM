@@ -55,6 +55,7 @@ void ServiceCore::stop(){
 	CloseHandle(this->m_watchdogThread);
 	// On arrête le proxy
 	this->m_vncProxy->stopAcceptingThread();
+	this->m_vncProxy->stopAllPairs();
 	delete this->m_vncProxy;
 	// On ferme le socket d'écoute
 	closesocket(this->m_italcListeningSocket);

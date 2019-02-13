@@ -2,7 +2,6 @@
 #include <cstdint>
 #include <string.h>
 
-#include "watchdog.h"
 #include "serviceMain.h"
 
 int main(int argc, char* argv[]){

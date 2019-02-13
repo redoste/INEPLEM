@@ -6,6 +6,9 @@
 #include <string>
 #include <cstdint>
 
+// On n'inclus pas directement "pipe.h" pour évitez une "boucle" de strcture (co-dépandance)
+typedef struct PipeConfiguration PipeConfiguration;
+
 /* Structure VncProxyConnection: représente une paire de connections gérée par VncProxy
  */
 typedef struct VncProxyConnection{
@@ -13,6 +16,8 @@ typedef struct VncProxyConnection{
 	sockaddr italcMasterAddr;
 	std::string italcMasterAddrStr;
 	SOCKET libvncSocket;
+	PipeConfiguration *italcToLibvncPipe;
+	PipeConfiguration *libvncToItalcPipe;
 	uint8_t alive;
 } VncProxyConnection;
 
@@ -26,6 +31,8 @@ class VncProxy{
 		uint32_t acceptingThread();
 		void startAcceptingThread();
 		void stopAcceptingThread();
+		void stopPair(uint32_t pairId);
+		void stopAllPairs();
 	private:
 		std::vector<VncProxyConnection> m_connections;
 		SOCKET m_listeningSocket;
