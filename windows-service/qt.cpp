@@ -59,19 +59,19 @@ void sendQInt(SOCKET sockOut, uint32_t qint){
 std::string recvQString(SOCKET sockIn){
 	char buffer[8192];
 	uint32_t stringSize = recvQInt(sockIn);
-	if(stringSize > 8192){
+	if(stringSize > 8192 || stringSize == 0){
 		// [TODO] : Buffer dynamique
-		std::cerr << "[recvQString] String too big" << std::endl;
-		return std::string("BUFFER SIZE ERROR");
+		std::cerr << "[recvQString] String too big len:" << stringSize << std::endl;
+		return std::string("");
 	}
-	recv(sockIn, buffer, 8192, 0);
+	recv(sockIn, buffer, stringSize, 0);
 
 	// On retire les 0x00 inutiles pour faire une "conversion" (très salle) de l'UTF-16 (Big-Endian) en UTF-8
 	char outString[stringSize / 2 + 1];
-	for(uint32_t i = 1; i <= 8192 / 2; i++){
+	for(uint32_t i = 1; i <= stringSize / 2; i++){
 		outString[i - 1] = buffer[i * 2 - 1];
 	}
-	outString[8192 / 2] = '\0';
+	outString[stringSize / 2] = '\0';
 	return std::string(outString);
 }
 
@@ -94,6 +94,6 @@ void sendQString(SOCKET sockOut, std::string stringIn){
 		}
 
 		sendQInt(sockOut, finalSize);
-		send(sockOut, buffer, 8192, 0);
+		send(sockOut, buffer, finalSize, 0);
 	}
 }
