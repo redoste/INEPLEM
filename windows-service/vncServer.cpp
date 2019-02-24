@@ -6,6 +6,7 @@
 
 #include "vncServer.h"
 #include "serviceCore.h"
+#include "italcExtension.h"
 
 /* vncServerThread: est démarré par un thread qui redirige vers VncServer::serverThread
  * LPVOID lpParameter: Pointeur vers le VncServer utilisé
@@ -37,6 +38,7 @@ VncServer::VncServer(uint16_t port, ServiceCore *service){
 	this->m_screen->port = port;
 	this->m_screen->ipv6port = port;
 	this->m_screen->frameBuffer = this->m_frameBuffer;
+	italcExtensionRegister();
 
 	rfbInitServer(this->m_screen);
 }

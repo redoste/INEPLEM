@@ -2,17 +2,20 @@
 #include <cstdint>
 #include <winsock2.h>
 #include <ws2tcpip.h>
+#include <rfb/rfb.h>
 
 #include "qt.h"
 
+// ATTENTION: Dans certain cas, le terme Socket est utilisé dans ce fichier pour désigner des rfbClientPtr
+
 /* recvQVariantHeader: Reçois le type d'un QVariant via un socket
- * SOCKET sockIn: Socket pour la reception
+ * rfbClientPtr sockIn: Socket pour la reception
  * Retourne un uint32_t: le type du QVariant
  */
-uint32_t recvQVariantHeader(SOCKET sockIn){
+uint32_t recvQVariantHeader(rfbClientPtr sockIn){
 	char unkVal;
 	uint32_t QVariantType = recvQInt(sockIn);
-	recv(sockIn, &unkVal, 1, 0);
+	rfbReadExact(sockIn, &unkVal, 1);
 	return QVariantType;
 }
 
@@ -27,12 +30,12 @@ void sendQVariantHeader(SOCKET sockOut, uint32_t qtype){
 }
 
 /* recvQInt: Reçois un QInt via un socket
- * SOCKET sockIn: Socket pour la reception
+ * rfbClientPtr sockIn: Socket pour la reception
  * Retourne un uint32_t: le QInt
  */
-uint32_t recvQInt(SOCKET sockIn){
+uint32_t recvQInt(rfbClientPtr sockIn){
 	char qintBuffer[4];
-	recv(sockIn, qintBuffer, 4, 0);
+	rfbReadExact(sockIn, qintBuffer, 4);
 	// Ce "roullement" d'octet est requis car les QInt sont en Big-Endian contrairement au CPU x86 qui sont en Little-endian.
 	return qintBuffer[3] + (qintBuffer[2] << 8) + (qintBuffer[1] << 16) + (qintBuffer[0] << 24);
 }
@@ -53,25 +56,25 @@ void sendQInt(SOCKET sockOut, uint32_t qint){
 }
 
 /* recvQString: Reçois une QString via un socket
- * SOCKET sockIn: Socket pour la reception
+ * rfbClientPtr sockIn: Socket pour la reception
  * Retourne une std::string: la QString
  */
-std::string recvQString(SOCKET sockIn){
-	char buffer[8192];
-	uint32_t stringSize = recvQInt(sockIn);
-	if(stringSize > 8192 || stringSize == 0){
-		// [TODO] : Buffer dynamique
-		std::cerr << "[recvQString] String too big len:" << stringSize << std::endl;
+std::string recvQString(rfbClientPtr sockIn){
+	int32_t stringSize = (int32_t) recvQInt(sockIn);
+	if(stringSize <= 0){
+		std::cerr << "[recvQString] Empty string len:" << stringSize << std::endl;
 		return std::string("");
 	}
-	recv(sockIn, buffer, stringSize, 0);
+	char* buffer = new char[stringSize];
+	rfbReadExact(sockIn, buffer, stringSize);
 
 	// On retire les 0x00 inutiles pour faire une "conversion" (très salle) de l'UTF-16 (Big-Endian) en UTF-8
 	char outString[stringSize / 2 + 1];
-	for(uint32_t i = 1; i <= stringSize / 2; i++){
+	for(int32_t i = 1; i <= stringSize / 2; i++){
 		outString[i - 1] = buffer[i * 2 - 1];
 	}
 	outString[stringSize / 2] = '\0';
+	delete buffer;
 	return std::string(outString);
 }
 

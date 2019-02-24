@@ -22,7 +22,8 @@ g++ -std=c++17 serviceCore.cpp -c -o obj/serviceCore.o -Wall -Wextra -DWIN32 %cf
 g++ -std=c++17 net.cpp -c -o obj/net.o -Wall -Wextra -DWIN32 %cflags%
 g++ -std=c++17 qt.cpp -c -o obj/qt.o -Wall -Wextra -DWIN32 %cflags%
 g++ -std=c++17 vncServer.cpp -c -o obj/vncServer.o -Wall -Wextra -DWIN32 %cflags%
-g++ -std=c++17 obj/main.o obj/watchdog.o obj/serviceMain.o obj/serviceCore.o obj/net.o obj/qt.o obj/vncServer.o -lvncserver -lws2_32 %lflags%
+g++ -std=c++17 italcExtension.cpp -c -o obj/italcExtension.o -Wall -Wextra -DWIN32 %cflags%
+g++ -std=c++17 obj/main.o obj/watchdog.o obj/serviceMain.o obj/serviceCore.o obj/net.o obj/qt.o obj/vncServer.o obj/italcExtension.o -lvncserver -lws2_32 %lflags%
 @echo off
 goto end
 
