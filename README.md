@@ -10,7 +10,7 @@ Pour la compilation du windows-service
 --------------------------------------
 
 * Configuration d'example pour libvncserver
-`cmake.exe ../libvncserver-LibVNCServer-0.9.12/ -G "MSYS Makefiles" -D CMAKE_C_FLAGS="${CMAKE_C_FLAGS} -DWINVER=0x0501 -D_WIN3_WINNT=0x0501"`
+`cmake.exe ../libvncserver-LibVNCServer-0.9.12/ -G "MSYS Makefiles" -D CMAKE_C_FLAGS="${CMAKE_C_FLAGS} -DWINVER=0x0501 -D_WIN32_WINNT=0x0501"`
 Avec msys, mingw et cmake dans le path (un rollback de mingw32-w32api à la 5.0.1 peut être nécésaire)
 
 * Patch pour la libvncserver:
