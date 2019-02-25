@@ -28,7 +28,8 @@ g++ -std=c++17 msAuth.cpp -c -o obj/msAuth.o -Wall -Wextra -DWIN32 %cflags%
 g++ -std=c++17 dh.cpp -c -o obj/dh.o -Wall -Wextra -DWIN32 %cflags%
 gcc d3des.c -c -o obj/d3des.o -Wall -Wextra -DWIN32 %cflags%
 g++ -std=c++17 noneAuth.cpp -c -o obj/noneAuth.o -Wall -Wextra -DWIN32 %cflags%
-g++ -std=c++17 obj/ressource.res obj/main.o obj/watchdog.o obj/serviceMain.o obj/serviceCore.o obj/net.o obj/qt.o obj/vncServer.o obj/italcExtension.o obj/msAuth.o obj/dh.o obj/d3des.o obj/noneAuth.o -lvncserver -lws2_32 %lflags%
+g++ -std=c++17 ui.cpp -c -o obj/ui.o -Wall -Wextra -DWIN32 %cflags%
+g++ -std=c++17 obj/ressource.res obj/main.o obj/watchdog.o obj/serviceMain.o obj/serviceCore.o obj/net.o obj/qt.o obj/vncServer.o obj/italcExtension.o obj/msAuth.o obj/dh.o obj/d3des.o obj/noneAuth.o obj/ui.o -lvncserver -lws2_32 %lflags%
 @echo off
 goto end
 
