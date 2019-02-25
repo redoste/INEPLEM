@@ -94,14 +94,14 @@ void VncServer::updateSecurityTypes(){
 			// VNC_MSAUTH => On essaye de unregister noneAuth et de register msAuthII
 			this->tryToUnregister(&this->m_noneAuth);
 			if(this->m_msAuthII == NULL){
-				this->m_msAuthII = msAuthIIRegisterSecurity();
+				this->m_msAuthII = msAuthIIRegisterSecurity(this->m_service);
 			}
 			break;
 		case VNC_NONEAUTH:
 			// VNC_NONEAUTH => On essaye de unregister msAuthII et de register noneAuth
 			this->tryToUnregister(&this->m_msAuthII);
 			if(this->m_noneAuth == NULL){
-				this->m_noneAuth = noneAuthRegisterSecurity();
+				this->m_noneAuth = noneAuthRegisterSecurity(this->m_service);
 			}
 			break;
 		default:

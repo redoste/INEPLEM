@@ -4,6 +4,6 @@
 #include <rfb/rfb.h>
 
 void noneAuthHandler(rfbClientRec *client);
-rfbSecurityHandler* noneAuthRegisterSecurity();
+rfbSecurityHandler* noneAuthRegisterSecurity(ServiceCore* service);
 
 #endif

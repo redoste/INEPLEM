@@ -9,8 +9,10 @@
 #define VNC_MSAUTH 0x71
 #define VNC_NONEAUTH 0x01
 
-#define VNC_ACCEPT rfbVncAuthOk
-#define VNC_REJECT rfbVncAuthFailed
+/*#define VNC_ACCEPT rfbVncAuthOk
+#define VNC_REJECT rfbVncAuthFailed*/
+#define VNC_ACCEPT 0
+#define VNC_REJECT 1
 
 #define ITALC_PORT 11100
 
@@ -29,6 +31,7 @@ class ServiceCore{
 		std::string getUsername(){ return this->m_italcUsername; };
 		uint8_t getUsernameNull(){ return this->m_italcUsernameNull; };
 		uint8_t getAuthtype(){ return this->m_italcAuthtype; };
+		uint32_t getAuthresponse() { return this->m_italcAuthresponse; };
 		void setAuthtype(uint8_t authtype){
 			this->m_italcAuthtype = authtype;
 			this->m_vncServer->updateSecurityTypes();
@@ -43,7 +46,7 @@ class ServiceCore{
 		std::string m_italcUsername;
 		uint8_t m_italcUsernameNull;
 		uint8_t m_italcAuthtype;
-		uint8_t m_italcAuthresponse;
+		uint32_t m_italcAuthresponse;
 		uint8_t m_italcSleep;
 
 		VncServer* m_vncServer;

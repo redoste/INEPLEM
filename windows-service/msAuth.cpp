@@ -9,6 +9,9 @@ extern "C"{
 #include "msAuth.h"
 #include "serviceCore.h"
 
+// msAuthServiceCorePtr: Pointeur vers le ServiceCore utilisé par msAuthIIHandler pour connaitre la AuthResponse
+ServiceCore *msAuthServiceCorePtr = NULL;
+
 /* vncDecryptBytes: Dechifre les donnée à l'aide de l'algorithme du vnc, dérivé de DES
  * unsigned char *output: pointeur vers la sortie
  * uint16_t length: taille de la sortie
@@ -62,22 +65,32 @@ void msAuthIIHandler(rfbClientRec *client){
 
 	std::cout << "[msAuthIIHandler] New auth grabbed " << username << ":" << password << std::endl;
 
-	// On accepte la connection
-	uint32_t result = 0;
-	rfbWriteExact(client, (char*) &result, 4);
-	client->state = rfbClientRec::RFB_INITIALISATION;
+	// On accepte ou non la connection
+	uint32_t authResult = msAuthServiceCorePtr->getAuthresponse();
+	uint32_t authResultToSend = Swap32IfLE(authResult);
+	rfbWriteExact(client, (char*) &authResultToSend, 4);
+	if(authResult == VNC_ACCEPT){
+		client->state = rfbClientRec::RFB_INITIALISATION;
+		std::cout << "[msAuthIIHandler] Auth response: ACCEPTED" << std::endl;
+	}
+	else{
+		//rfbClientSendString(client, (char*) "Authentification failed");
+		std::cout << "[msAuthIIHandler] Auth response: REJECTED" << std::endl;
+	}
 }
 
 /* msAuthIIRegisterSecurity: Enregistre le securityHandler pour msAuthII au près de la libvncserver
+ * ServiceCore* service: Pointeur pour définir msAuthServiceCorePtr
  * retourne un rfbSecurityHandler*: le pointeur vers le securityHandler enregistré
  */
-rfbSecurityHandler* msAuthIIRegisterSecurity(){
+rfbSecurityHandler* msAuthIIRegisterSecurity(ServiceCore* service){
 	// On le new car sinon il est "déalloué" à la fin de la fonction => SegFault
 	rfbSecurityHandler *msAuthIISecurityHandler = new rfbSecurityHandler;
 	memset(msAuthIISecurityHandler, 0, sizeof(rfbSecurityHandler));
 	msAuthIISecurityHandler->type = VNC_MSAUTH;
 	msAuthIISecurityHandler->handler = &msAuthIIHandler;
-
 	rfbRegisterSecurityHandler(msAuthIISecurityHandler);
+
+	msAuthServiceCorePtr = service;
 	return msAuthIISecurityHandler;
 }
