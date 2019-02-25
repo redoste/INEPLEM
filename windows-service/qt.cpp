@@ -20,13 +20,13 @@ uint32_t recvQVariantHeader(rfbClientPtr sockIn){
 }
 
 /* sendQVariantHeader: Envois le type d'un QVariant via un socket
- * SOCKET sockOut: Socket pour l'envois
+ * rfbClientPtr sockOut: Socket pour l'envois
  * uint32_t qtype: type du QVarriant
  */
-void sendQVariantHeader(SOCKET sockOut, uint32_t qtype){
+void sendQVariantHeader(rfbClientPtr sockOut, uint32_t qtype){
 	char unkVal = 0;
 	sendQInt(sockOut, qtype);
-	send(sockOut, &unkVal, 1, 0);
+	rfbWriteExact(sockOut, &unkVal, 1);
 }
 
 /* recvQInt: Reçois un QInt via un socket
@@ -41,10 +41,10 @@ uint32_t recvQInt(rfbClientPtr sockIn){
 }
 
 /* sendQInt: Envois un QInt via un socket
- * SOCKET sockOut: Socket pour l'envois
+ * rfbClientPtr sockOut: Socket pour l'envois
  * uint42_t qint: QInt à envoyer
  */
-void sendQInt(SOCKET sockOut, uint32_t qint){
+void sendQInt(rfbClientPtr sockOut, uint32_t qint){
 	char qintBEBuffer[4];
 	char *qintLEBuffer = (char*) &qint;
 	// Ce "roullement" d'octet est requis car les QInt sont en Big-Endian contrairement au CPU x86 qui sont en Little-endian.
@@ -52,7 +52,7 @@ void sendQInt(SOCKET sockOut, uint32_t qint){
 	qintBEBuffer[1] = qintLEBuffer[2];
 	qintBEBuffer[2] = qintLEBuffer[1];
 	qintBEBuffer[3] = qintLEBuffer[0];
-	send(sockOut, qintBEBuffer, 4, 0);
+	rfbWriteExact(sockOut, qintBEBuffer, 4);
 }
 
 /* recvQString: Reçois une QString via un socket
@@ -79,10 +79,10 @@ std::string recvQString(rfbClientPtr sockIn){
 }
 
 /* sendQString: Envois une QString via un socket
- * SOCKET sockOut: Socket pour l'envois
+ * rfbClientPtr sockOut: Socket pour l'envois
  * std::string stringIn: QString à envoyer
  */
-void sendQString(SOCKET sockOut, std::string stringIn){
+void sendQString(rfbClientPtr sockOut, std::string stringIn){
 	char buffer[8192];
 	uint32_t finalSize = stringIn.length() * 2;
 	if(finalSize > 8192){
@@ -97,6 +97,6 @@ void sendQString(SOCKET sockOut, std::string stringIn){
 		}
 
 		sendQInt(sockOut, finalSize);
-		send(sockOut, buffer, finalSize, 0);
+		rfbWriteExact(sockOut, buffer, finalSize);
 	}
 }

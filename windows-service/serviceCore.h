@@ -25,6 +25,8 @@ class ServiceCore{
 		void stop();
 		void italcSleep();
 		void kill();
+		std::string getUsername(){ return this->m_italcUsername; };
+		uint8_t getUsernameNull(){ return this->m_italcUsernameNull; };
 	private:
 		HANDLE m_watchdogThread;
 		std::string m_italcUsername;

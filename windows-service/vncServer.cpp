@@ -40,7 +40,7 @@ VncServer::VncServer(uint16_t port, ServiceCore *service){
 	this->m_screen->ipv6port = port;
 	this->m_screen->frameBuffer = this->m_frameBuffer;
 
-	italcExtensionRegister();
+	italcExtensionRegister(service);
 	msAuthIIRegisterSecurity();
 
 	rfbInitServer(this->m_screen);

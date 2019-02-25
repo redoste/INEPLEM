@@ -6,6 +6,10 @@
 
 #include "qt.h"
 #include "italcExtension.h"
+#include "serviceCore.h"
+
+// italcExtensionServiceCorePtr: Pointeur vers le serviceCore, utilisé par italcResponseUserInformation pour connaitre le nom d'utilisateur
+ServiceCore *italcExtensionServiceCorePtr = NULL;
 
 /* italcExtensionHandleClient: Fonction indiquant si l'extension italc doit être chargé pour se client
  * Retourne toujours le rfbBool TRUE
@@ -57,13 +61,17 @@ rfbBool italcExtensionHandleMessage(rfbClientRec *client, void *, const rfbClien
 		}
 	}
 	std::cout << consoleOut;
+
+	if(command == "GetUserInformation"){
+		italcResponseUserInformation(client);
+	}
 	return TRUE;
 }
 
 /* italcExtensionRegister: Enregistre l'extension italc au près de la libvnc
  * Ne prend aucun paramètre et n'a aucun retour
  */
-void italcExtensionRegister(){
+void italcExtensionRegister(ServiceCore *service){
 	// On le new car sinon il est "déalloué" à la fin de la fonction => SegFault
 	rfbProtocolExtension *italcExtension = new rfbProtocolExtension;
 	memset(italcExtension, 0, sizeof(rfbProtocolExtension));
@@ -71,4 +79,35 @@ void italcExtensionRegister(){
 	italcExtension->newClient = &italcExtensionHandleClient;
 
 	rfbRegisterProtocolExtension(italcExtension);
+
+	italcExtensionServiceCorePtr = service;
+}
+
+/* italcResponseUserInformation: Envois un message UserInformation si nécéssaire
+ * rfbClientRec *client: Pointeur vers les informations du client VNC
+ */
+void italcResponseUserInformation(rfbClientRec *client){
+	if(italcExtensionServiceCorePtr->getUsernameNull() == 0){
+		std::string username = italcExtensionServiceCorePtr->getUsername();
+
+		// Information que c'est un message Italc
+		char italcMessage[] = {0x28};
+		rfbWriteExact(client, italcMessage, 1);
+
+		sendQString(client, "UserInformation"); // Message "UserInformation"
+		sendQInt(client, 2); // Avec 2 arguments
+
+		sendQString(client, "username"); // Arguments "username"
+		sendQVariantHeader(client, QVARIANT_STRING);
+		sendQString(client, username);
+
+		sendQString(client, "homedir"); // Arguments "homedir"
+		sendQVariantHeader(client, QVARIANT_STRING);
+		sendQString(client, "/dev/null"); // Il n'est pas utilisé par iTalc, on lui envois donc une valeur innutile
+
+		std::cout << "[italcResponseUserInformation] Sent user information: " << username << std::endl;
+	}
+	else{
+		std::cout << "[italcResponseUserInformation] User information not sent" << std::endl;
+	}
 }
