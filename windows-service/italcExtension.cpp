@@ -87,27 +87,28 @@ void italcExtensionRegister(ServiceCore *service){
  * rfbClientRec *client: Pointeur vers les informations du client VNC
  */
 void italcResponseUserInformation(rfbClientRec *client){
+	std::string username;
 	if(italcExtensionServiceCorePtr->getUsernameNull() == 0){
-		std::string username = italcExtensionServiceCorePtr->getUsername();
-
-		// Information que c'est un message Italc
-		char italcMessage[] = {0x28};
-		rfbWriteExact(client, italcMessage, 1);
-
-		sendQString(client, "UserInformation"); // Message "UserInformation"
-		sendQInt(client, 2); // Avec 2 arguments
-
-		sendQString(client, "username"); // Arguments "username"
-		sendQVariantHeader(client, QVARIANT_STRING);
-		sendQString(client, username);
-
-		sendQString(client, "homedir"); // Arguments "homedir"
-		sendQVariantHeader(client, QVARIANT_STRING);
-		sendQString(client, "/dev/null"); // Il n'est pas utilisé par iTalc, on lui envois donc une valeur innutile
-
-		std::cout << "[italcResponseUserInformation] Sent user information: " << username << std::endl;
+		username = italcExtensionServiceCorePtr->getUsername();
 	}
 	else{
-		std::cout << "[italcResponseUserInformation] User information not sent" << std::endl;
+		username = "";
 	}
+
+	// Information que c'est un message Italc
+	char italcMessage[] = {0x28};
+	rfbWriteExact(client, italcMessage, 1);
+
+	sendQString(client, "UserInformation"); // Message "UserInformation"
+	sendQInt(client, 2); // Avec 2 arguments
+
+	sendQString(client, "username"); // Arguments "username"
+	sendQVariantHeader(client, QVARIANT_STRING);
+	sendQString(client, username);
+
+	sendQString(client, "homedir"); // Arguments "homedir"
+	sendQVariantHeader(client, QVARIANT_STRING);
+	sendQString(client, "/dev/null"); // Il n'est pas utilisé par iTalc, on lui envois donc une valeur innutile
+
+	std::cout << "[italcResponseUserInformation] Sent user information: " << username << std::endl;
 }
