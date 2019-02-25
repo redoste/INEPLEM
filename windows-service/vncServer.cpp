@@ -8,6 +8,7 @@
 #include "serviceCore.h"
 #include "italcExtension.h"
 #include "msAuth.h"
+#include "noneAuth.h"
 
 /* vncServerThread: est démarré par un thread qui redirige vers VncServer::serverThread
  * LPVOID lpParameter: Pointeur vers le VncServer utilisé
@@ -41,7 +42,10 @@ VncServer::VncServer(uint16_t port, ServiceCore *service){
 	this->m_screen->frameBuffer = this->m_frameBuffer;
 
 	italcExtensionRegister(service);
-	msAuthIIRegisterSecurity();
+
+	this->m_noneAuth = NULL;
+	this->m_msAuthII = NULL;
+	this->updateSecurityTypes();
 
 	rfbInitServer(this->m_screen);
 }
@@ -79,4 +83,43 @@ void VncServer::stopThread(){
 VncServer::~VncServer(){
 	rfbScreenCleanup(this->m_screen);
 	delete this->m_frameBuffer;
+}
+
+/* VncServer::updateSecurityTypes: Met à jour les security types enregistré au près de libvnc
+ * Aucun paramètre ni retour
+ */
+void VncServer::updateSecurityTypes(){
+	switch(this->m_service->getAuthtype()){
+		case VNC_MSAUTH:
+			// VNC_MSAUTH => On essaye de unregister noneAuth et de register msAuthII
+			this->tryToUnregister(&this->m_noneAuth);
+			if(this->m_msAuthII == NULL){
+				this->m_msAuthII = msAuthIIRegisterSecurity();
+			}
+			break;
+		case VNC_NONEAUTH:
+			// VNC_NONEAUTH => On essaye de unregister msAuthII et de register noneAuth
+			this->tryToUnregister(&this->m_msAuthII);
+			if(this->m_noneAuth == NULL){
+				this->m_noneAuth = noneAuthRegisterSecurity();
+			}
+			break;
+		default:
+			// Aucun des deux => On les uregister tous les deux => Refuse forcement le client
+			this->tryToUnregister(&this->m_noneAuth);
+			this->tryToUnregister(&this->m_msAuthII);
+			break;
+	}
+}
+
+/* VncServer::tryToUnregister: Essaye de unregister un securityHandler
+ * rfbSecurityHandler **toUnregister: Pointeur vers le pointeur du security handler
+ */
+void VncServer::tryToUnregister(rfbSecurityHandler **toUnregister){
+	if(*toUnregister != NULL){
+		std::cout << "[VncServer::tryToUnregister] Unregister security handler: " << *toUnregister << std::endl;
+		rfbUnregisterSecurityHandler(*toUnregister);
+		delete *toUnregister;
+		*toUnregister = NULL;
+	}
 }

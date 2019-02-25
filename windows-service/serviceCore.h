@@ -4,13 +4,13 @@
 #include <Windows.h>
 #include <string>
 #include <cstdint>
+#include <rfb/rfbproto.h>
 
 #define VNC_MSAUTH 0x71
 #define VNC_NONEAUTH 0x01
 
-#define VNC_DROP 0x00
-#define VNC_REJECT 0x01
-#define VNC_ACCEPT 0x02
+#define VNC_ACCEPT rfbVncAuthOk
+#define VNC_REJECT rfbVncAuthFailed
 
 #define ITALC_PORT 11100
 
@@ -25,8 +25,14 @@ class ServiceCore{
 		void stop();
 		void italcSleep();
 		void kill();
+
 		std::string getUsername(){ return this->m_italcUsername; };
 		uint8_t getUsernameNull(){ return this->m_italcUsernameNull; };
+		uint8_t getAuthtype(){ return this->m_italcAuthtype; };
+		void setAuthtype(uint8_t authtype){
+			this->m_italcAuthtype = authtype;
+			this->m_vncServer->updateSecurityTypes();
+		};
 	private:
 		HANDLE m_watchdogThread;
 		std::string m_italcUsername;

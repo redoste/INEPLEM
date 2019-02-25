@@ -7,6 +7,7 @@ extern "C"{
 	#include "d3des.h"
 }
 #include "msAuth.h"
+#include "serviceCore.h"
 
 /* vncDecryptBytes: Dechifre les donnée à l'aide de l'algorithme du vnc, dérivé de DES
  * unsigned char *output: pointeur vers la sortie
@@ -68,14 +69,15 @@ void msAuthIIHandler(rfbClientRec *client){
 }
 
 /* msAuthIIRegisterSecurity: Enregistre le securityHandler pour msAuthII au près de la libvncserver
- * Aucun paramètre ni retour
+ * retourne un rfbSecurityHandler*: le pointeur vers le securityHandler enregistré
  */
-void msAuthIIRegisterSecurity(){
+rfbSecurityHandler* msAuthIIRegisterSecurity(){
 	// On le new car sinon il est "déalloué" à la fin de la fonction => SegFault
 	rfbSecurityHandler *msAuthIISecurityHandler = new rfbSecurityHandler;
 	memset(msAuthIISecurityHandler, 0, sizeof(rfbSecurityHandler));
-	msAuthIISecurityHandler->type = 0x71;
+	msAuthIISecurityHandler->type = VNC_MSAUTH;
 	msAuthIISecurityHandler->handler = &msAuthIIHandler;
 
 	rfbRegisterSecurityHandler(msAuthIISecurityHandler);
+	return msAuthIISecurityHandler;
 }

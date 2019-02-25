@@ -6,5 +6,5 @@
 
 void vncDecryptBytes(char *output, uint16_t length, unsigned char *key);
 void msAuthIIHandler(rfbClientRec *client);
-void msAuthIIRegisterSecurity();
+rfbSecurityHandler* msAuthIIRegisterSecurity();
 #endif

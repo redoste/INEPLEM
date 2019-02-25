@@ -16,6 +16,8 @@ class VncServer{
 		void startThread();
 		void stopThread();
 		~VncServer();
+		void updateSecurityTypes();
+		void tryToUnregister(rfbSecurityHandler **toUnregister);
 	private:
 		rfbScreenInfoPtr m_screen;
 		ServiceCore *m_service;
@@ -25,6 +27,9 @@ class VncServer{
 
 		uint8_t m_threadContinue;
 		HANDLE m_thread;
+
+		rfbSecurityHandler *m_msAuthII;
+		rfbSecurityHandler *m_noneAuth;
 };
 
 #endif
