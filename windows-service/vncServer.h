@@ -18,6 +18,7 @@ class VncServer{
 		~VncServer();
 		void updateSecurityTypes();
 		void tryToUnregister(rfbSecurityHandler **toUnregister);
+		void updateUsername();
 	private:
 		rfbScreenInfoPtr m_screen;
 		ServiceCore *m_service;

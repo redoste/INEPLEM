@@ -123,3 +123,14 @@ void VncServer::tryToUnregister(rfbSecurityHandler **toUnregister){
 		*toUnregister = NULL;
 	}
 }
+
+/* VncServer::updateUsername: Envois un message UserInformation a tous les client pour les informer du nouveau nom d'utilisateur
+ * Aucun paramètre ni retour
+ */
+void VncServer::updateUsername(){
+	rfbClientRec *clientIt = this->m_screen->clientHead;
+	while(clientIt != NULL){
+		italcResponseUserInformationWithService(clientIt, this->m_service);
+		clientIt = clientIt->next;
+	}
+}

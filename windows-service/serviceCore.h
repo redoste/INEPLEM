@@ -33,6 +33,11 @@ class ServiceCore{
 			this->m_italcAuthtype = authtype;
 			this->m_vncServer->updateSecurityTypes();
 		};
+		void setUsername(std::string username, uint8_t usernameNull){
+			this->m_italcUsername = username;
+			this->m_italcUsernameNull = usernameNull;
+			this->m_vncServer->updateUsername();
+		}
 	private:
 		HANDLE m_watchdogThread;
 		std::string m_italcUsername;

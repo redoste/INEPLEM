@@ -112,3 +112,12 @@ void italcResponseUserInformation(rfbClientRec *client){
 
 	std::cout << "[italcResponseUserInformation] Sent user information: " << username << std::endl;
 }
+
+/* italcResponseUserInformationWithService: Appelle italcResponseUserInformation et définis italcExtensionServiceCorePtr pour éviter tous segfault
+ * rfbClientRec *client: client a passer à italcResponseUserInformation
+ * ServiceCore *service: valeur de italcExtensionServiceCorePtr
+ */
+void italcResponseUserInformationWithService(rfbClientRec *client, ServiceCore *service){
+	italcExtensionServiceCorePtr = service;
+	italcResponseUserInformation(client);
+}
