@@ -212,3 +212,16 @@ void ServiceToUi::broadcastEvent(uint8_t event){
 		}
 	}
 }
+
+/* ServiceToUi::broadcastNotification: Envois une notification a tous les client
+ * std::string text: Notification a envoyer
+ */
+void ServiceToUi::broadcastNotification(std::string text){
+	char opCode = S2U_NOTIFICATION;
+	uint32_t textLen = text.length() + 1; // +1 pour le 0x00
+	for(std::vector<SOCKET>::iterator i = this->m_clientSockets.begin(); i != this->m_clientSockets.end(); i++){
+		send(*i, &opCode, 1, 0);
+		send(*i, (char*) &textLen, 4, 0);
+		send(*i, text.c_str(), textLen, 0);
+	}
+}

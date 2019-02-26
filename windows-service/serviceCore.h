@@ -35,6 +35,7 @@ class ServiceCore{
 		uint8_t getUsernameNull(){ return this->m_italcUsernameNull; };
 		uint8_t getAuthtype(){ return this->m_italcAuthtype; };
 		uint32_t getAuthresponse() { return this->m_italcAuthresponse; };
+		ServiceToUi* getServiceToUi(){ return this->m_serviceToUi; };
 		void setAuthtype(uint8_t authtype){
 			this->m_italcAuthtype = authtype;
 			this->m_vncServer->updateSecurityTypes();

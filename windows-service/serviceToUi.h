@@ -23,6 +23,7 @@ class ServiceToUi{
 		void eventAuthresponse(SOCKET socket);
 		void eventUsername(SOCKET socket);
 		void broadcastEvent(uint8_t event);
+		void broadcastNotification(std::string text);
 	private:
 		ServiceCore *m_service;
 		HANDLE m_acceptingThread;

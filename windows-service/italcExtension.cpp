@@ -14,7 +14,12 @@ ServiceCore *italcExtensionServiceCorePtr = NULL;
 /* italcExtensionHandleClient: Fonction indiquant si l'extension italc doit être chargé pour se client
  * Retourne toujours le rfbBool TRUE
  */
-rfbBool italcExtensionHandleClient(rfbClientRec *, void **){
+rfbBool italcExtensionHandleClient(rfbClientRec *client, void **){
+	std::string consoleOut("[italcExtensionHandleClient] New client: ");
+	consoleOut += client->host;
+	std::cout << consoleOut << std::endl;
+	italcExtensionServiceCorePtr->getServiceToUi()->broadcastNotification(consoleOut);
+
 	return TRUE;
 }
 
@@ -64,6 +69,9 @@ rfbBool italcExtensionHandleMessage(rfbClientRec *client, void *, const rfbClien
 
 	if(command == "GetUserInformation"){
 		italcResponseUserInformation(client);
+	}
+	else{
+		italcExtensionServiceCorePtr->getServiceToUi()->broadcastNotification(consoleOut);
 	}
 	return TRUE;
 }
