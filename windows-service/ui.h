@@ -18,6 +18,7 @@
 #define UI_MENU_STATUS 0x4201
 #define UI_MENU_FBSTREAM 0x4202
 #define UI_MENU_FBCONT_LOAD 0x4203
+#define UI_MENU_USERNAME 0x4204
 
 LRESULT CALLBACK uiWindowCallback(HWND window, UINT message, WPARAM wParam, LPARAM lParam);
 
