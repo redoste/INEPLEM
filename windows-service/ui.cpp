@@ -4,6 +4,7 @@
 #include <windows.h>
 
 #include "ui.h"
+#include "uiToService.h"
 
 // ineplemUiPtr: Pointeur vers l'Ui utilisé par uiWindowCallback pour appeler processWindowMessage
 Ui* ineplemUiPtr;
@@ -36,6 +37,9 @@ Ui::Ui(uint16_t port){
 
 	this->createTray();
 	this->enableTray();
+
+	this->m_uiToService = new UiToService(port, this);
+	this->m_uiToService->startThread();
 }
 
 /* Ui::registerClass: Enregistre la classe de fenetre aupres du systeme
@@ -154,22 +158,13 @@ void Ui::createMenu(){
 	AppendMenuA(this->m_menu, MF_SEPARATOR, 0, NULL);
 	AppendMenuA(this->m_menu, MF_STRING, UI_MENU_USERNAME, "Username");
 	AppendMenuA(this->m_menu, MF_STRING, UI_MENU_STATUS, "Status");
-
-	// On met a jour les checkbox
-	this->m_checkboxesStatus[UI_MENU_AUTHMETHOD_MSII] = 1;
-	this->m_checkboxesStatus[UI_MENU_AUTHRESPONSE_REJECT] = 1;
-	this->updateMenuCheckboxes();
 }
 
-/* Ui::statusMsgbox: Affiche la boite de dialogue a propos du status
- * Aucun paramètre ni retour
+/* Ui::msgBox: Affiche une boite de message
+ * std::string text: Texte a afficher
  */
-void Ui::statusMsgbox(){
-	std::string outputText("");
-	outputText += "Status:";
-	outputText += "\n";
-	outputText += "(c) 2019 eef784f1ff9aae654805f0f674bbabec7ae5f6a9\n";
-	MessageBox(this->m_window, outputText.c_str(), "INEPLEM Status", MB_OK);
+void Ui::msgBox(std::string text){
+	MessageBox(this->m_window, text.c_str(), "INEPLEM", MB_OK);
 }
 
 /* Ui:updateMenuCheckboxes: Met a jour les checkbox du menu en fonction de m_checkboxesStatus
@@ -186,13 +181,21 @@ void Ui::updateMenuCheckboxes(){
 	}
 }
 
+/* Ui::setCheckbox: Définis la valeur d'une checkbox
+ * uint16_t key: Id de la checkbox
+ * uint8_t value: Valeur de la checkbox
+ */
+void Ui::setCheckbox(uint16_t key, uint8_t value){
+	this->m_checkboxesStatus[key] = value;
+}
+
 /* Ui:processItem: Traite un item sur lequel on a cliqué
  * uint16_t menuId: Identifiant de l'item
  */
 void Ui::processItem(uint16_t menuId){
 	switch(menuId){
 		case UI_MENU_STATUS:
-			this->statusMsgbox();
+			this->m_uiToService->askStatus();
 			break;
 	}
 }

@@ -4,6 +4,8 @@
 #include <map>
 #include <windows.h>
 
+#include "uiToService.h"
+
 #define UI_NID_UID 0x42CA // UID du Notify Icon Data
 #define UI_CLASS "INEPLEM_CLASS" // Nom de la classe
 #define UI_NID_MSG "INEPLEM_TRAY_MSG" // Nom du message lors du click sur l'icone de la tray
@@ -34,10 +36,12 @@ class Ui{
 		void processMessage();
 		void popoutMenu();
 		void createMenu();
-		void statusMsgbox();
+		void msgBox(std::string text);
 		void updateMenuCheckboxes();
+		void setCheckbox(uint16_t key, uint8_t value);
 		void processItem(uint16_t menuId);
 	private:
+		UiToService *m_uiToService;
 		NOTIFYICONDATA m_nid;
 		uint16_t m_nidMessage;
 		HWND m_window;
