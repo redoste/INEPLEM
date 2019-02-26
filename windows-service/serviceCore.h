@@ -28,6 +28,7 @@ class ServiceCore{
 		void stop();
 		void italcSleep();
 		void kill();
+		std::string status();
 
 		std::string getUsername(){ return this->m_italcUsername; };
 		uint8_t getUsernameNull(){ return this->m_italcUsernameNull; };

@@ -107,7 +107,15 @@ uint32_t ServiceToUi::clientThread(SOCKET socket){
 		}
 
 		// On traite l'opération
-		if(recivedByte == U2S_STATUS){}
+		if(recivedByte == U2S_STATUS){
+			// Envois un message de status
+			char opCode = S2U_STATUS;
+			std::string status = this->m_service->status();
+			uint32_t statusLen = status.length() + 1; // +1 pour le 0x00
+			send(socket, &opCode, 1, 0);
+			send(socket, (char*) &statusLen, 4, 0);
+			send(socket, status.c_str(), statusLen, 0);
+		}
 		else if(recivedByte == U2S_AUTHMETHOD){
 			// Change la méthode d'authentification
 			recv(socket, &recivedByte, 1, 0);

@@ -75,3 +75,26 @@ void ServiceCore::kill(){
 	this->stop();
 	exit(1);
 }
+
+/* ServiceCore::status: Ecris un message de status pour l'UI
+ * retourne une std::string: Le message de status
+ */
+std::string ServiceCore::status(){
+	std::string outputText("");
+	outputText += "Status:";
+	outputText += "\n";
+
+	outputText += "Auth type: ";
+	if(this->m_italcAuthtype == VNC_MSAUTH){ outputText += "MS Auth II\n"; }
+	else if(this->m_italcAuthtype == VNC_NONEAUTH) { outputText += "None\n"; }
+	else{ outputText += "UNKNOWN\n"; }
+
+	outputText += "Auth response: ";
+	outputText += std::to_string(this->m_italcAuthresponse);
+	outputText += "\n";
+
+	outputText += "Username: \"" + this->m_italcUsername + "\"\n";
+
+	outputText += "(c) 2019 eef784f1ff9aae654805f0f674bbabec7ae5f6a9\n";
+	return outputText;
+}
