@@ -3,6 +3,7 @@
 
 #include <cstdint>
 #include <Windows.h>
+#include <vector>
 
 class ServiceCore;
 
@@ -18,11 +19,16 @@ class ServiceToUi{
 		void stopAcceptingThread();
 		uint32_t acceptingThread();
 		uint32_t clientThread(SOCKET socket);
+		void eventAuthmethod(SOCKET socket);
+		void eventAuthresponse(SOCKET socket);
+		void eventUsername(SOCKET socket);
+		void broadcastEvent(uint8_t event);
 	private:
 		ServiceCore *m_service;
 		HANDLE m_acceptingThread;
 		uint8_t m_acceptingThreadContinue;
 		SOCKET m_listeningSocket;
+		std::vector<SOCKET> m_clientSockets;
 };
 
 /* serviceToUiClientThreadParam: Structure pour les paramètres de serviceToUiClientThread

@@ -18,6 +18,7 @@
 
 #include "vncServer.h"
 #include "serviceToUi.h"
+#include "uiProtocol.h"
 
 /* Classe ServiceCore: Gère et coordonne les différent composant du service
  */
@@ -37,14 +38,17 @@ class ServiceCore{
 		void setAuthtype(uint8_t authtype){
 			this->m_italcAuthtype = authtype;
 			this->m_vncServer->updateSecurityTypes();
+			this->m_serviceToUi->broadcastEvent(S2U_AUTHMETHOD);
 		};
 		void setUsername(std::string username, uint8_t usernameNull){
 			this->m_italcUsername = username;
 			this->m_italcUsernameNull = usernameNull;
 			this->m_vncServer->updateUsername();
+			this->m_serviceToUi->broadcastEvent(S2U_USERNAME);
 		}
 		void setAuthresponse(uint32_t authresponse){
 			this->m_italcAuthresponse = authresponse;
+			this->m_serviceToUi->broadcastEvent(S2U_AUTHRESPONSE);
 		}
 	private:
 		HANDLE m_watchdogThread;

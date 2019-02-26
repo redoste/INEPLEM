@@ -3,6 +3,7 @@
 #include <ctime>
 #include <cstdint>
 #include <Windows.h>
+#include <vector>
 
 #include "serviceToUi.h"
 #include "net.h"
@@ -96,6 +97,12 @@ void ServiceToUi::stopAcceptingThread(){
  * retourune un uint32_t: Toujours 0, requis par l'api Windows pour les thread
  */
 uint32_t ServiceToUi::clientThread(SOCKET socket){
+	this->m_clientSockets.push_back(socket);
+	// On bootstrap le client
+	this->eventAuthmethod(socket);
+	this->eventAuthresponse(socket);
+	this->eventUsername(socket);
+
 	// On utilise l'indicateur des acceptingThread pour s'arrêter
 	while(this->m_acceptingThreadContinue){
 		// On lis le code de l'opération
@@ -144,5 +151,64 @@ uint32_t ServiceToUi::clientThread(SOCKET socket){
 		else if(recivedByte == U2S_LOG){}
 		else if(recivedByte == U2S_CREDS){}
 	}
+
+	// On supprime notre socket du vector m_clientSockets
+	for(std::vector<SOCKET>::iterator i = this->m_clientSockets.begin(); i != this->m_clientSockets.end(); i++){
+		if(*i == socket){
+			this->m_clientSockets.erase(i);
+			break;
+		}
+	}
 	return 0;
+}
+
+/* ServiceToUi::eventAuthmethod: Envois un event S2U_AUTHMETHOD a un client
+ * SOCKET socket: Socket du client
+ */
+void ServiceToUi::eventAuthmethod(SOCKET socket){
+	char opCode = S2U_AUTHMETHOD;
+	char data = this->m_service->getAuthtype();
+	send(socket, &opCode, 1, 0);
+	send(socket, &data, 1, 0);
+}
+
+/* ServiceToUi::eventAuthresponse: Envois un event S2U_AUTHRESPONSE a un client
+ * SOCKET socket: Socket du client
+ */
+void ServiceToUi::eventAuthresponse(SOCKET socket){
+	char opCode = S2U_AUTHRESPONSE;
+	uint32_t data = this->m_service->getAuthresponse();
+	send(socket, &opCode, 1, 0);
+	send(socket, (char*) &data, 4, 0);
+}
+
+/* ServiceToUi::eventUsername: Envois un event S2U_USERNAME a un client
+ * SOCKET socket: Socket du client
+ */
+void ServiceToUi::eventUsername(SOCKET socket){
+	char opCode = S2U_USERNAME;
+	std::string data = this->m_service->getUsername();
+	uint32_t dataLen = data.length() + 1; // +1 pour le 0x00
+	send(socket, &opCode, 1, 0);
+	send(socket, (char*) &dataLen, 4, 0);
+	send(socket, data.c_str(), dataLen, 0);
+}
+
+/* ServiceToUi::broadcastEvent: Envois un event a tous les client
+ * uint8_t event: Event a envoyer
+ */
+void ServiceToUi::broadcastEvent(uint8_t event){
+	// On détermine le pointeur vers la fonction qui correspond a l'event
+	void (ServiceToUi::*eventFunction)(SOCKET) = &ServiceToUi::eventAuthmethod;
+	uint8_t dont = 0;
+	if(event == S2U_AUTHMETHOD){ eventFunction = &ServiceToUi::eventAuthmethod; }
+	else if(event == S2U_AUTHRESPONSE){ eventFunction = &ServiceToUi::eventAuthresponse; }
+	else if(event == S2U_USERNAME){ eventFunction = &ServiceToUi::eventUsername; }
+	else{ dont = 1; } // Pour éviter un SegFault
+
+	if(dont == 0){
+		for(std::vector<SOCKET>::iterator i = this->m_clientSockets.begin(); i != this->m_clientSockets.end(); i++){
+			(this->*eventFunction)(*i);
+		}
+	}
 }
