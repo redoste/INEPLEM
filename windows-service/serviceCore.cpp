@@ -5,6 +5,7 @@
 #include "watchdog.h"
 #include "net.h"
 #include "vncServer.h"
+#include "serviceToUi.h"
 
 /* ServiceCore::ServiceCore: Constructeur qui initialise toutes les valeurs
  */
@@ -37,6 +38,10 @@ void ServiceCore::start(){
 	// On démarre le serveur VNC
 	this->m_vncServer = new VncServer(ITALC_PORT, this);
 	this->m_vncServer->startThread();
+
+	// On démare la connection vers l'UI
+	this->m_serviceToUi = new ServiceToUi(this);
+	this->m_serviceToUi->startAcceptingThread();
 }
 
 /* ServiceCore::stop: Arrête les différents composant du service
@@ -50,6 +55,10 @@ void ServiceCore::stop(){
 	// On arrête le serveur VNC
 	this->m_vncServer->stopThread();
 	delete this->m_vncServer;
+
+	// On arrête la connection vers l'Ui
+	this->m_serviceToUi->stopAcceptingThread();
+	delete this->m_serviceToUi;
 }
 
 /* ServiceCore::italcSleep: Est appelée par le watchdog lorsque ITalc est arrêté

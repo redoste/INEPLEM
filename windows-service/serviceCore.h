@@ -17,6 +17,7 @@
 #define ITALC_PORT 11100
 
 #include "vncServer.h"
+#include "serviceToUi.h"
 
 /* Classe ServiceCore: Gère et coordonne les différent composant du service
  */
@@ -41,6 +42,9 @@ class ServiceCore{
 			this->m_italcUsernameNull = usernameNull;
 			this->m_vncServer->updateUsername();
 		}
+		void setAuthresponse(uint32_t authresponse){
+			this->m_italcAuthresponse = authresponse;
+		}
 	private:
 		HANDLE m_watchdogThread;
 		std::string m_italcUsername;
@@ -50,6 +54,7 @@ class ServiceCore{
 		uint8_t m_italcSleep;
 
 		VncServer* m_vncServer;
+		ServiceToUi* m_serviceToUi;
 };
 
 #endif

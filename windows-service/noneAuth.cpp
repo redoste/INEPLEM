@@ -22,6 +22,7 @@ void noneAuthHandler(rfbClientRec *client){
 	else{
 		//rfbClientSendString(client, (char*) "Authentification failed");
 		std::cout << "[noneAuthHandler] New client choose NoneAuth : REJECTED" << std::endl;
+		rfbCloseClient(client);
 	}
 }
 

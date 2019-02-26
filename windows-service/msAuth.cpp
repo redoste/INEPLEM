@@ -76,6 +76,7 @@ void msAuthIIHandler(rfbClientRec *client){
 	else{
 		//rfbClientSendString(client, (char*) "Authentification failed");
 		std::cout << "[msAuthIIHandler] Auth response: REJECTED" << std::endl;
+		rfbCloseClient(client);
 	}
 }
 
