@@ -6,6 +6,7 @@
 #include "ui.h"
 #include "uiToService.h"
 #include "serviceCore.h"
+#include "resource.h"
 
 // ineplemUiPtr: Pointeur vers l'Ui utilisé par uiWindowCallback pour appeler processWindowMessage
 Ui* ineplemUiPtr;
@@ -18,6 +19,16 @@ Ui* ineplemUiPtr;
  */
 LRESULT CALLBACK uiWindowCallback(HWND window, UINT message, WPARAM wParam, LPARAM lParam){
 	return ineplemUiPtr->processWindowMessage(window, message, wParam, lParam);
+}
+
+/* uiUsernameDialogCallback: Fonction appelé lors d'un nouveau message sur la dialog de changement de username, transfert vers Ui::processUsernameDialogMessage
+ * HWND window: Dialog
+ * UINT message: Identifiant du message
+ * WPARAM wParam et LPARAM lParam: Paramètres du message
+ * Retourne 1 si le message a été traité, 0 sinon
+ */
+INT_PTR CALLBACK uiUsernameDialogCallback(HWND window, UINT message, WPARAM wParam, LPARAM lParam){
+	return ineplemUiPtr->processUsernameDialogMessage(window, message, wParam, lParam);
 }
 
 /* Ui::Ui: Constructeur de Ui
@@ -210,5 +221,39 @@ void Ui::processItem(uint16_t menuId){
 		case UI_MENU_AUTHMETHOD_NONE:
 			this->m_uiToService->sendAuthmethod(VNC_NONEAUTH);
 			break;
+		case UI_MENU_USERNAME:
+			DialogBoxParamA(NULL, MAKEINTRESOURCEA(IDD_DIALOG1), this->m_window, &uiUsernameDialogCallback, 0);
+			break;
 	}
+}
+
+/* Ui::processUsernameDialogMessage: Fonction appelé lors d'un nouveau message sur la dialog de changement de username, appelé via uiUsernameDialogCallback
+ * HWND window: Dialog
+ * UINT message: Identifiant du message
+ * WPARAM wParam et LPARAM lParam: Paramètres du message
+ * Retourne 1 si le message a été traité, 0 sinon
+ */
+int16_t Ui::processUsernameDialogMessage(HWND window, UINT message, WPARAM wParam, LPARAM){
+	if(message == WM_COMMAND){
+		switch(LOWORD(wParam)){
+			case IDOK:
+				this->updateUsernameFromDialog(window);
+			case IDCANCEL:
+				EndDialog(window, 0);
+				break;
+		}
+		return 1;
+	}
+	return 0;
+}
+
+/* Ui::updateUsernameFromDialog: Extrait le nom d'utilisateur de la dialog et l'envois au UiToSerivce
+ * HWND dialog: Dialog
+ */
+void Ui::updateUsernameFromDialog(HWND dialog){
+	char *buffer = new char[8192]; // Peut être rendue dynamique ?
+	GetDlgItemTextA(dialog, IDUSERNAME, buffer, 8192);
+	std::string username(buffer);
+	delete buffer;
+	this->m_uiToService->sendUsername(username);
 }

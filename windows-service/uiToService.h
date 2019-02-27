@@ -19,6 +19,7 @@ class UiToService{
 		void askStatus();
 		void sendAuthmethod(uint8_t authMethod);
 		void sendAuthresponse(uint32_t authResponse);
+		void sendUsername(std::string username);
 	private:
 		SOCKET m_socket;
 		Ui* m_ui;

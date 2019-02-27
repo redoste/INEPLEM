@@ -139,3 +139,14 @@ void UiToService::sendAuthresponse(uint32_t authResponse){
 	send(this->m_socket, &opCode, 1, 0);
 	send(this->m_socket, (char*) &authResponse, 4, 0);
 }
+
+/* UiToService::sendUsername: Envois un message U2S_USERNAME au service
+ * std::string username: username à envoyer au service
+ */
+void UiToService::sendUsername(std::string username){
+	uint32_t usernameLen = username.length() + 1; //+1 pour le 0x00
+	char opCode = U2S_USERNAME;
+	send(this->m_socket, &opCode, 1, 0);
+	send(this->m_socket, (char*) &usernameLen, 4, 0);
+	send(this->m_socket, username.c_str(), usernameLen, 0);
+}

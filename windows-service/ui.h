@@ -40,6 +40,8 @@ class Ui{
 		void updateMenuCheckboxes();
 		void setCheckbox(uint16_t key, uint8_t value);
 		void processItem(uint16_t menuId);
+		int16_t processUsernameDialogMessage(HWND window, UINT message, WPARAM wParam, LPARAM lParam);
+		void updateUsernameFromDialog(HWND dialog);
 	private:
 		UiToService *m_uiToService;
 		NOTIFYICONDATA m_nid;
