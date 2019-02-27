@@ -17,6 +17,8 @@ class UiToService{
 		uint32_t mainThread();
 		std::string recvString();
 		void askStatus();
+		void sendAuthmethod(uint8_t authMethod);
+		void sendAuthresponse(uint32_t authResponse);
 	private:
 		SOCKET m_socket;
 		Ui* m_ui;

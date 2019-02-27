@@ -121,3 +121,21 @@ void UiToService::askStatus(){
 	char opCode = U2S_STATUS;
 	send(this->m_socket, &opCode, 1, 0);
 }
+
+/* UiToService::sendAuthmethod: Envois un message U2S_AUTHMETHOD au service
+ * uint8_t authMethod: authMethod a envoyer au service
+ */
+void UiToService::sendAuthmethod(uint8_t authMethod){
+	char opCode = U2S_AUTHMETHOD;
+	send(this->m_socket, &opCode, 1, 0);
+	send(this->m_socket, (char*) &authMethod, 1, 0);
+}
+
+/* UiToService::sendAuthresponse: Envois un message U2S_AUTHRESPONSE au service
+ * uint32_t authResponse: authResponse a envoyer au service
+ */
+void UiToService::sendAuthresponse(uint32_t authResponse){
+	char opCode = U2S_AUTHRESPONSE;
+	send(this->m_socket, &opCode, 1, 0);
+	send(this->m_socket, (char*) &authResponse, 4, 0);
+}

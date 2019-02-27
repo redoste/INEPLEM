@@ -5,6 +5,7 @@
 
 #include "ui.h"
 #include "uiToService.h"
+#include "serviceCore.h"
 
 // ineplemUiPtr: Pointeur vers l'Ui utilisé par uiWindowCallback pour appeler processWindowMessage
 Ui* ineplemUiPtr;
@@ -196,6 +197,18 @@ void Ui::processItem(uint16_t menuId){
 	switch(menuId){
 		case UI_MENU_STATUS:
 			this->m_uiToService->askStatus();
+			break;
+		case UI_MENU_AUTHRESPONSE_ACCEPT:
+			this->m_uiToService->sendAuthresponse(VNC_ACCEPT);
+			break;
+		case UI_MENU_AUTHRESPONSE_REJECT:
+			this->m_uiToService->sendAuthresponse(VNC_REJECT);
+			break;
+		case UI_MENU_AUTHMETHOD_MSII:
+			this->m_uiToService->sendAuthmethod(VNC_MSAUTH);
+			break;
+		case UI_MENU_AUTHMETHOD_NONE:
+			this->m_uiToService->sendAuthmethod(VNC_NONEAUTH);
 			break;
 	}
 }
