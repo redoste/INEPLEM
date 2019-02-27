@@ -1,4 +1,5 @@
 #include <iostream>
+#include <map>
 #include <string>
 
 #include "serviceCore.h"
@@ -93,8 +94,28 @@ std::string ServiceCore::status(){
 	outputText += std::to_string(this->m_italcAuthresponse);
 	outputText += "\n";
 
-	outputText += "Username: \"" + this->m_italcUsername + "\"\n";
+	outputText += "Username: \"" + this->m_italcUsername + "\"\n\n";
+
+	outputText += "Seen clients:\n";
+	for(std::map<std::string, uint8_t>::iterator i = this->m_clientsSeen.begin(); i != this->m_clientsSeen.end(); i++){
+		outputText += "    " + i->first + " : " + std::to_string(i->second) + "\n";
+	}
+	outputText += "\n";
 
 	outputText += "(c) 2019 eef784f1ff9aae654805f0f674bbabec7ae5f6a9\n";
 	return outputText;
+}
+
+/* ServiceCore::clientSeen: Marque que un client s'est connecté dans m_clientsSeen
+ * std::string address: Addresse du client
+ */
+void ServiceCore::clientSeen(std::string address){
+	// On verifie si il est déjà dans la liste de manière a incrémenter son compteur
+	std::map<std::string, uint8_t>::iterator i = this->m_clientsSeen.find(address);
+	if(i == this->m_clientsSeen.end()){
+		this->m_clientsSeen[address] = 1;
+	}
+	else{
+		this->m_clientsSeen[address] += 1;
+	}
 }

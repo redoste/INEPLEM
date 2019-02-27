@@ -5,6 +5,8 @@
 #include <string>
 #include <cstdint>
 #include <rfb/rfbproto.h>
+#include <map>
+#include <string>
 
 #define VNC_MSAUTH 0x71
 #define VNC_NONEAUTH 0x01
@@ -30,6 +32,7 @@ class ServiceCore{
 		void italcSleep();
 		void kill();
 		std::string status();
+		void clientSeen(std::string address);
 
 		std::string getUsername(){ return this->m_italcUsername; };
 		uint8_t getUsernameNull(){ return this->m_italcUsernameNull; };
@@ -58,6 +61,7 @@ class ServiceCore{
 		uint8_t m_italcAuthtype;
 		uint32_t m_italcAuthresponse;
 		uint8_t m_italcSleep;
+		std::map<std::string, uint8_t> m_clientsSeen;
 
 		VncServer* m_vncServer;
 		ServiceToUi* m_serviceToUi;

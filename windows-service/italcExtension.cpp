@@ -16,9 +16,10 @@ ServiceCore *italcExtensionServiceCorePtr = NULL;
  */
 rfbBool italcExtensionHandleClient(rfbClientRec *client, void **){
 	std::string consoleOut("[italcExtensionHandleClient] New client: ");
-	consoleOut += client->host;
+	std::string address(client->host);
+	consoleOut += address;
 	std::cout << consoleOut << std::endl;
-	italcExtensionServiceCorePtr->getServiceToUi()->broadcastNotification(consoleOut);
+	italcExtensionServiceCorePtr->clientSeen(address);
 
 	return TRUE;
 }
