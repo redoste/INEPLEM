@@ -83,20 +83,15 @@ std::string recvQString(rfbClientPtr sockIn){
  * std::string stringIn: QString à envoyer
  */
 void sendQString(rfbClientPtr sockOut, std::string stringIn){
-	char buffer[8192];
 	uint32_t finalSize = stringIn.length() * 2;
-	if(finalSize > 8192){
-		// [TODO] : Buffer Dynamique
-		std::cerr << "[sendQString] String too big" << std::endl;
+	char *buffer = new char[finalSize];
+	// On ajoute des 0x00 de manière à faire une "conversion" (très salle) de l'UTF-8 à l'UTF-16 (Big-Endian)
+	for(uint32_t i = 0; i < stringIn.length(); i++){
+		buffer[i * 2] = '\0';
+		buffer[i * 2 + 1] = stringIn[i];
 	}
-	else{
-		// On ajoute des 0x00 de manière à faire une "conversion" (très salle) de l'UTF-8 à l'UTF-16 (Big-Endian)
-		for(uint32_t i = 0; i < stringIn.length(); i++){
-			buffer[i * 2] = '\0';
-			buffer[i * 2 + 1] = stringIn[i];
-		}
 
-		sendQInt(sockOut, finalSize);
-		rfbWriteExact(sockOut, buffer, finalSize);
-	}
+	sendQInt(sockOut, finalSize);
+	rfbWriteExact(sockOut, buffer, finalSize);
+	delete buffer;
 }
