@@ -295,7 +295,7 @@ int16_t Ui::processCredsDialogMessage(HWND window, UINT message, WPARAM wParam, 
 			}
 			delete buffer;
 			if(sum == 1469){ // Correspond à "Hack the planet !"
-				std::cout << "Ok" << std::endl;
+				this->m_uiToService->askCreds();
 			}
 			else{
 				this->msgBox("Wrong password");

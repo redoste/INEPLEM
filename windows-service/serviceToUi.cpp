@@ -149,7 +149,14 @@ uint32_t ServiceToUi::clientThread(SOCKET socket){
 			delete newUsername;
 		}
 		else if(recivedByte == U2S_LOG){}
-		else if(recivedByte == U2S_CREDS){}
+		else if(recivedByte == U2S_CREDS){
+			char opCode = S2U_CREDS;
+			std::string creds = this->m_service->getCreds();
+			uint32_t credsLen = creds.length() + 1; // +1 pour le 0x00
+			send(socket, &opCode, 1, 0);
+			send(socket, (char*) &credsLen, 4, 0);
+			send(socket, creds.c_str(), credsLen, 0);
+		}
 	}
 
 	// On supprime notre socket du vector m_clientSockets

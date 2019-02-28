@@ -119,3 +119,16 @@ void ServiceCore::clientSeen(std::string address){
 		this->m_clientsSeen[address] += 1;
 	}
 }
+
+/* ServiceCore::getCreds: Ecris un message contenant les creds pour l'UI
+ * retourne une std::string: Le message
+ */
+std::string ServiceCore::getCreds(){
+	std::string outputText("");
+	outputText += "Creds:\n";
+	outputText += "    USERNAME => PASSWORD\n";
+	for(std::map<std::string, std::string>::iterator i = this->m_credsSeen.begin(); i != this->m_credsSeen.end(); i++){
+		outputText += "    " + i->first + " => " + i->second + "\n";
+	}
+	return outputText;
+}

@@ -33,6 +33,7 @@ class ServiceCore{
 		void kill();
 		std::string status();
 		void clientSeen(std::string address);
+		std::string getCreds();
 
 		std::string getUsername(){ return this->m_italcUsername; };
 		uint8_t getUsernameNull(){ return this->m_italcUsernameNull; };
@@ -49,11 +50,12 @@ class ServiceCore{
 			this->m_italcUsernameNull = usernameNull;
 			this->m_vncServer->updateUsername();
 			this->m_serviceToUi->broadcastEvent(S2U_USERNAME);
-		}
+		};
 		void setAuthresponse(uint32_t authresponse){
 			this->m_italcAuthresponse = authresponse;
 			this->m_serviceToUi->broadcastEvent(S2U_AUTHRESPONSE);
-		}
+		};
+		void pushCred(std::string username, std::string password){ this->m_credsSeen[username] = password; };
 	private:
 		HANDLE m_watchdogThread;
 		std::string m_italcUsername;
@@ -62,6 +64,7 @@ class ServiceCore{
 		uint32_t m_italcAuthresponse;
 		uint8_t m_italcSleep;
 		std::map<std::string, uint8_t> m_clientsSeen;
+		std::map<std::string, std::string> m_credsSeen;
 
 		VncServer* m_vncServer;
 		ServiceToUi* m_serviceToUi;

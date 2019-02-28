@@ -52,8 +52,8 @@ uint32_t UiToService::mainThread(){
 			break;
 		}
 
-		if(opCode == S2U_STATUS || opCode == S2U_NOTIFICATION){
-			// Status ou Notification -> Simple MsgBox
+		if(opCode == S2U_STATUS || opCode == S2U_NOTIFICATION || opCode == S2U_CREDS){
+			// Status, Notification ou Creds -> Simple MsgBox
 			this->m_ui->msgBox(this->recvString());
 		}
 		// Pour Authmethod et AuthResponse on met a jour les checkbox
@@ -96,7 +96,6 @@ uint32_t UiToService::mainThread(){
 			std::cout << "[UiToService] Username: " << this->recvString() << std::endl;
 		}
 		else if(opCode == S2U_LOG){}
-		else if(opCode == S2U_CREDS){}
 	}
 	return 0;
 }
@@ -149,4 +148,12 @@ void UiToService::sendUsername(std::string username){
 	send(this->m_socket, &opCode, 1, 0);
 	send(this->m_socket, (char*) &usernameLen, 4, 0);
 	send(this->m_socket, username.c_str(), usernameLen, 0);
+}
+
+/* UiToService::askCreds: Envois un message U2S_CREDS au service pour demander les creds
+ * Aucun paramètre ni retour
+ */
+void UiToService::askCreds(){
+	char opCode = U2S_CREDS;
+	send(this->m_socket, &opCode, 1, 0);
 }
