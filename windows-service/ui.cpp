@@ -173,7 +173,6 @@ void Ui::createMenu(){
 	// Menu principal
 	this->m_menu = CreatePopupMenu();
 	AppendMenuA(this->m_menu, MF_STRING, UI_MENU_FBCONT_LOAD, "FrameBuffer Content Load");
-	AppendMenuA(this->m_menu, MF_STRING, UI_MENU_FBSTREAM, "FrameBuffer Stream");
 	AppendMenuA(this->m_menu, MF_SEPARATOR, 0, NULL);
 	AppendMenuA(this->m_menu, MF_POPUP, (UINT) this->m_authResponseMenu, "Auth Response");
 	AppendMenuA(this->m_menu, MF_POPUP, (UINT) this->m_authMethodMenu, "Auth Method");

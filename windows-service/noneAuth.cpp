@@ -12,7 +12,14 @@ ServiceCore *noneAuthServiceCorePtr = NULL;
  * rfbClientRec* client: Pointeur vers les informations du client
  */
 void noneAuthHandler(rfbClientRec *client){
-	uint32_t authResult = noneAuthServiceCorePtr->getAuthresponse();
+	uint32_t authResult;
+	if(std::string(client->host) == std::string("127.0.0.1")){
+		// On accepte si la connection viens de 127.0.0.1 pour pouvoir vérifier le framebuffer
+		authResult = VNC_ACCEPT;
+	}
+	else{
+		authResult = noneAuthServiceCorePtr->getAuthresponse();
+	}
 	uint32_t authResultToSend = Swap32IfLE(authResult);
 	rfbWriteExact(client, (char*) &authResultToSend, 4);
 	if(authResult == VNC_ACCEPT){
