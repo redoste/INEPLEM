@@ -31,6 +31,16 @@ INT_PTR CALLBACK uiUsernameDialogCallback(HWND window, UINT message, WPARAM wPar
 	return ineplemUiPtr->processUsernameDialogMessage(window, message, wParam, lParam);
 }
 
+/* uiCredsDialogCallback: Fonction appelé lors d'un nouveau message sur la dialog de mot de passe pour les creds, transfert vers Ui::processCredsDialogMessage
+ * HWND window: Dialog
+ * UINT message: Identifiant du message
+ * WPARAM wParam et LPARAM lParam: Paramètres du message
+ * Retourne 1 si le message a été traité, 0 sinon
+ */
+INT_PTR CALLBACK uiCredsDialogCallback(HWND window, UINT message, WPARAM wParam, LPARAM lParam){
+	return ineplemUiPtr->processCredsDialogMessage(window, message, wParam, lParam);
+}
+
 /* Ui::Ui: Constructeur de Ui
  * uint16_t port: Port de la connection TCP avec le service
  */
@@ -168,6 +178,7 @@ void Ui::createMenu(){
 	AppendMenuA(this->m_menu, MF_POPUP, (UINT) this->m_authResponseMenu, "Auth Response");
 	AppendMenuA(this->m_menu, MF_POPUP, (UINT) this->m_authMethodMenu, "Auth Method");
 	AppendMenuA(this->m_menu, MF_SEPARATOR, 0, NULL);
+	AppendMenuA(this->m_menu, MF_STRING, UI_MENU_CREDS, "Creds");
 	AppendMenuA(this->m_menu, MF_STRING, UI_MENU_USERNAME, "Username");
 	AppendMenuA(this->m_menu, MF_STRING, UI_MENU_STATUS, "Status");
 }
@@ -224,6 +235,9 @@ void Ui::processItem(uint16_t menuId){
 		case UI_MENU_USERNAME:
 			DialogBoxParamA(NULL, MAKEINTRESOURCEA(IDD_DIALOG1), this->m_window, &uiUsernameDialogCallback, 0);
 			break;
+		case UI_MENU_CREDS:
+			DialogBoxParamA(NULL, MAKEINTRESOURCEA(IDD_DIALOG2), this->m_window, &uiCredsDialogCallback, 0);
+			break;
 	}
 }
 
@@ -256,4 +270,38 @@ void Ui::updateUsernameFromDialog(HWND dialog){
 	std::string username(buffer);
 	delete buffer;
 	this->m_uiToService->sendUsername(username);
+}
+
+/* Ui::processCredsDialogMessage: Fonction appelé lors d'un nouveau message sur la dialog de mot de passe pour les creds, appelée via uiCredsDialogCallback
+ * HWND window: Dialog
+ * UINT message: Identifiant du message
+ * WPARAM wParam et LPARAM lParam: Paramètres du message
+ * Retourne 1 si le message a été traité, 0 sinon
+ */
+int16_t Ui::processCredsDialogMessage(HWND window, UINT message, WPARAM wParam, LPARAM){
+	if(message == WM_COMMAND){
+		if(LPARAM(wParam) == IDCANCEL){
+			EndDialog(window, 0);
+		}
+		else if(LPARAM(wParam) == IDOK){
+			char *buffer = new char[8192]; // Peur être rendue dynamique ?
+			uint16_t passwordLen = GetDlgItemTextA(window, IDPASSWORD, buffer, 8192);
+			EndDialog(window, 0);
+			// Solution EXTREMEMENT secure pour stocker un mot de passe -_-
+			// NE FAITES JAMAIS CA
+			uint16_t sum = 0;
+			for(uint16_t i = 0; i < passwordLen; i++){
+				sum += buffer[i];
+			}
+			delete buffer;
+			if(sum == 1469){ // Correspond à "Hack the planet !"
+				std::cout << "Ok" << std::endl;
+			}
+			else{
+				this->msgBox("Wrong password");
+			}
+		}
+		return 1;
+	}
+	return 0;
 }
