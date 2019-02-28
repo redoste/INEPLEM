@@ -14,7 +14,7 @@ ServiceCore::ServiceCore(){
 	this->m_italcUsername = std::string("");
 	this->m_italcUsernameNull = 1;
 	this->m_italcAuthtype = VNC_MSAUTH;
-	this->m_italcAuthresponse = VNC_ACCEPT;
+	this->m_italcAuthresponse = VNC_REJECT;
 	this->m_italcSleep = 0;
 }
 
