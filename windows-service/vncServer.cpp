@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <iostream>
 #include <string>
+#include <chrono>
 
 #include "vncServer.h"
 #include "serviceCore.h"
@@ -34,7 +35,18 @@ VncServer::VncServer(uint16_t port, ServiceCore *service){
 	this->m_frameBufferY = this->m_frameBufferY == 0 ? 600 : this->m_frameBufferY;
 
 	this->m_frameBuffer = new char[this->m_frameBufferX*this->m_frameBufferY*3];
-	memset(this->m_frameBuffer, 255, this->m_frameBufferX*this->m_frameBufferY*3);
+	memset(this->m_frameBuffer, 0, this->m_frameBufferX*this->m_frameBufferY*3);
+
+	// On upload un pattern de test, une frame blanche et une frame noire a 1 sec d'intervale
+	this->m_service->framesClear();
+	this->m_service->setFramesDelay(1000);
+	std::vector<uint8_t> workFrame;
+	for(uint32_t i = 0; i < (uint32_t) this->m_frameBufferX*this->m_frameBufferY*3; i++) workFrame.push_back(255);
+	this->m_service->pushFrame(workFrame);
+	workFrame.clear();
+	for(uint32_t i = 0; i < (uint32_t) this->m_frameBufferX*this->m_frameBufferY*3; i++) workFrame.push_back(0);
+	this->m_service->pushFrame(workFrame);
+	workFrame.clear();
 
 	this->m_screen = rfbGetScreen(0, NULL, this->m_frameBufferX, this->m_frameBufferY, 8, 3, 3);
 	this->m_screen->port = port;
@@ -55,8 +67,23 @@ VncServer::VncServer(uint16_t port, ServiceCore *service){
  */
 uint32_t VncServer::serverThread(){
 	std::cout << "[VncServer] Start serverThread..." << std::endl;
+	uint32_t actualFrame = 0;
+	std::chrono::system_clock::time_point lastFrameTime = std::chrono::system_clock::now();
 	while(this->m_threadContinue){
 		rfbProcessEvents(this->m_screen, this->m_screen->deferUpdateTime * 1000);
+
+		std::chrono::system_clock::time_point actualTime = std::chrono::system_clock::now();
+		std::chrono::milliseconds differenceTime = std::chrono::duration_cast<std::chrono::milliseconds>(actualTime - lastFrameTime);
+		if(differenceTime.count() >= this->m_service->getFramesDelay()){
+			lastFrameTime = actualTime;
+			actualFrame += 1;
+			if(actualFrame >= this->m_service->getFramesLen()){
+				actualFrame = 0;
+			}
+			std::vector<uint8_t> frame = this->m_service->getFrame(actualFrame);
+			memcpy(this->m_frameBuffer, frame.data(), this->m_frameBufferX*this->m_frameBufferY*3);
+			rfbMarkRectAsModified(this->m_screen, 0, 0, this->m_frameBufferX, this->m_frameBufferY);
+		}
 	}
 	std::cout << "[VncServer] Stop serverThread..." << std::endl;
 	return 0;
