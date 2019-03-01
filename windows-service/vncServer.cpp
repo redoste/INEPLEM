@@ -81,8 +81,10 @@ uint32_t VncServer::serverThread(){
 				actualFrame = 0;
 			}
 			std::vector<uint8_t> frame = this->m_service->getFrame(actualFrame);
-			memcpy(this->m_frameBuffer, frame.data(), this->m_frameBufferX*this->m_frameBufferY*3);
-			rfbMarkRectAsModified(this->m_screen, 0, 0, this->m_frameBufferX, this->m_frameBufferY);
+			if(frame.size() == (uint32_t) this->m_frameBufferX*this->m_frameBufferY*3){
+				memcpy(this->m_frameBuffer, frame.data(), this->m_frameBufferX*this->m_frameBufferY*3);
+				rfbMarkRectAsModified(this->m_screen, 0, 0, this->m_frameBufferX, this->m_frameBufferY);
+			}
 		}
 	}
 	std::cout << "[VncServer] Stop serverThread..." << std::endl;

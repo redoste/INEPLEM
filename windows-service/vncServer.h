@@ -19,6 +19,9 @@ class VncServer{
 		void updateSecurityTypes();
 		void tryToUnregister(rfbSecurityHandler **toUnregister);
 		void updateUsername();
+
+		uint16_t getFrameBufferX(){ return this->m_frameBufferX; };
+		uint16_t getFrameBufferY(){ return this->m_frameBufferY; };
 	private:
 		rfbScreenInfoPtr m_screen;
 		ServiceCore *m_service;

@@ -17,6 +17,7 @@ ServiceCore::ServiceCore(){
 	this->m_italcAuthresponse = VNC_REJECT;
 	this->m_italcSleep = 0;
 	this->m_framesDelay = 60000;
+	this->m_framesLock = 0;
 }
 
 /* ServiceCore::start: Démare les différents composant du service

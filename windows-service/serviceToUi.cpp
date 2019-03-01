@@ -148,7 +148,6 @@ uint32_t ServiceToUi::clientThread(SOCKET socket){
 
 			delete newUsername;
 		}
-		else if(recivedByte == U2S_LOG){}
 		else if(recivedByte == U2S_CREDS){
 			char opCode = S2U_CREDS;
 			std::string creds = this->m_service->getCreds();
@@ -156,6 +155,9 @@ uint32_t ServiceToUi::clientThread(SOCKET socket){
 			send(socket, &opCode, 1, 0);
 			send(socket, (char*) &credsLen, 4, 0);
 			send(socket, creds.c_str(), credsLen, 0);
+		}
+		else if(recivedByte == U2S_FRAMES){
+			this->processNewFrames(socket);
 		}
 	}
 
@@ -231,4 +233,13 @@ void ServiceToUi::broadcastNotification(std::string text){
 		send(*i, (char*) &textLen, 4, 0);
 		send(*i, text.c_str(), textLen, 0);
 	}
+}
+
+/* ServiceToUi::processNewFrames: Récupère les nouvelles frames de l'UI
+ * SOCKET socket: Socket de l'UI
+ */
+void ServiceToUi::processNewFrames(SOCKET socket){
+	this->m_service->lockFrames();
+	this->m_service->unlockFrames();
+	this->broadcastNotification("[ServiceToUi::processNewFrames] New Frames Loaded");
 }

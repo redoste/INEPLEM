@@ -24,6 +24,7 @@ class ServiceToUi{
 		void eventUsername(SOCKET socket);
 		void broadcastEvent(uint8_t event);
 		void broadcastNotification(std::string text);
+		void processNewFrames(SOCKET socket);
 	private:
 		ServiceCore *m_service;
 		HANDLE m_acceptingThread;

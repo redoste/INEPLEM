@@ -95,7 +95,6 @@ uint32_t UiToService::mainThread(){
 			// On lit le username pour éviter un décalage
 			std::cout << "[UiToService] Username: " << this->recvString() << std::endl;
 		}
-		else if(opCode == S2U_LOG){}
 	}
 	return 0;
 }
