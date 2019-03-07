@@ -9,6 +9,7 @@
 #include "net.h"
 #include "uiProtocol.h"
 #include "serviceCore.h"
+#include "images.h"
 
 /* serviceToUiAcceptingThread: est démarré par un thread qui redirige vers ServiceToUi::acceptingThread
  * LPVOID lpParameter: Pointeur vers le ServiceToUi utilisé
@@ -235,11 +236,22 @@ void ServiceToUi::broadcastNotification(std::string text){
 	}
 }
 
-/* ServiceToUi::processNewFrames: Récupère les nouvelles frames de l'UI
+/* ServiceToUi::processNewFrames: Récupère les nouvelles frames de l'UI via loadImageToFrameBuffer
  * SOCKET socket: Socket de l'UI
  */
 void ServiceToUi::processNewFrames(SOCKET socket){
 	this->m_service->lockFrames();
+	this->m_service->framesClear();
+
+	uint32_t filenameLen = 0;
+	recv(socket, (char*) &filenameLen, 4, 0);
+	char *filenameCStr = new char[filenameLen];
+	recv(socket, filenameCStr, filenameLen, 0);
+	std::string filename = filenameCStr;
+	delete filenameCStr;
+
+	std::string outMessage = loadImageToFrameBuffer(filename, this->m_service);
+
 	this->m_service->unlockFrames();
-	this->broadcastNotification("[ServiceToUi::processNewFrames] New Frames Loaded");
+	this->broadcastNotification(outMessage);
 }

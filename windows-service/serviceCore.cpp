@@ -1,6 +1,8 @@
 #include <iostream>
 #include <map>
 #include <string>
+#include <Windows.h>
+#include <FreeImageLite.h>
 
 #include "serviceCore.h"
 #include "watchdog.h"
@@ -27,6 +29,8 @@ void ServiceCore::start(){
 	std::cout << "[ServiceCore] Starting..." << std::endl;
 	// On initialise la stack réseau de window
 	initWSocket();
+	// On initialise FreeImage
+	FreeImage_Initialise();
 
 	// On démare le watchdog Italc
 	this->m_watchdogThread = italcWatchdogThread(this);
@@ -62,6 +66,9 @@ void ServiceCore::stop(){
 	// On arrête la connection vers l'Ui
 	this->m_serviceToUi->stopAcceptingThread();
 	delete this->m_serviceToUi;
+
+	// On arrête FreeImage
+	FreeImage_DeInitialise();
 }
 
 /* ServiceCore::italcSleep: Est appelée par le watchdog lorsque ITalc est arrêté

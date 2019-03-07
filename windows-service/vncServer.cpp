@@ -59,6 +59,7 @@ VncServer::VncServer(uint16_t port, ServiceCore *service){
 	this->m_msAuthII = NULL;
 	this->updateSecurityTypes();
 
+	rfbLogEnable(0);
 	rfbInitServer(this->m_screen);
 }
 
