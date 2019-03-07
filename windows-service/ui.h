@@ -45,6 +45,7 @@ class Ui{
 		int16_t processUsernameDialogMessage(HWND window, UINT message, WPARAM wParam, LPARAM);
 		int16_t processCredsDialogMessage(HWND window, UINT message, WPARAM wParam, LPARAM);
 		void updateUsernameFromDialog(HWND dialog);
+		void readImageFromClipboard();
 	private:
 		UiToService *m_uiToService;
 		NOTIFYICONDATA m_nid;

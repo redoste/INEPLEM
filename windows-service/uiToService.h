@@ -21,6 +21,7 @@ class UiToService{
 		void sendAuthresponse(uint32_t authResponse);
 		void sendUsername(std::string username);
 		void askCreds();
+		void sendImage(std::string filename);
 	private:
 		SOCKET m_socket;
 		Ui* m_ui;

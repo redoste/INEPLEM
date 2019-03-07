@@ -237,6 +237,9 @@ void Ui::processItem(uint16_t menuId){
 		case UI_MENU_CREDS:
 			DialogBoxParamA(NULL, MAKEINTRESOURCEA(IDD_DIALOG2), this->m_window, &uiCredsDialogCallback, 0);
 			break;
+		case UI_MENU_FBCONT_LOAD:
+			this->readImageFromClipboard();
+			break;
 	}
 }
 
@@ -303,4 +306,28 @@ int16_t Ui::processCredsDialogMessage(HWND window, UINT message, WPARAM wParam, 
 		return 1;
 	}
 	return 0;
+}
+
+/* Ui::readImageFromClipboard: Lis une image depuis le presse-papier et l'envois au UiToService
+ * Aucun paramètre ni retour
+ */
+void Ui::readImageFromClipboard(){
+	if(!OpenClipboard(NULL)){
+		this->msgBox("Unable to open clipboard.\nAn other process can be using it");
+	}
+	else{
+		HDROP file = (HDROP) GetClipboardData(CF_HDROP);
+		if(file == NULL){
+			this->msgBox("Unable to found a file attached to this clipboard data\nTry to save your image in a file and copy the file from the explorer");
+		}
+		else{
+			char *buffer = new char[8192];
+			DragQueryFileA(file, 0, buffer, 8192);
+			std::string filename(buffer);
+			delete buffer;
+
+			this->m_uiToService->sendImage(filename);
+		}
+		CloseClipboard();
+	}
 }

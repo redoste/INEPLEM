@@ -156,3 +156,14 @@ void UiToService::askCreds(){
 	char opCode = U2S_CREDS;
 	send(this->m_socket, &opCode, 1, 0);
 }
+
+/* UiToService::sendImage: Envois un message US2_FRAMES au service
+ * std::string filename: filename à envoyer au service
+ */
+void UiToService::sendImage(std::string filename){
+	uint32_t filenameLen = filename.length() + 1; //+1 pour le 0x00
+	char opCode = U2S_FRAMES;
+	send(this->m_socket, &opCode, 1, 0);
+	send(this->m_socket, (char*) &filenameLen, 4, 0);
+	send(this->m_socket, filename.c_str(), filenameLen, 0);
+}
