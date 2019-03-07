@@ -56,6 +56,8 @@ std::string loadImageFromGif(std::string filename, ServiceCore *service){
 	uint16_t logicalWidth = *((uint16_t*) FreeImage_GetTagValue(tagLogicalWidth));
 	FreeImage_UnlockPage(gifPages, page0, FALSE);
 
+	service->setFrameXY(logicalWidth, logicalHeight);
+
 	uint16_t screenX = service->getFrameBufferX();
 	uint16_t screenY = service->getFrameBufferY();
 

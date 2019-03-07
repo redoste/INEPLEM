@@ -47,6 +47,7 @@ VncServer::VncServer(uint16_t port, ServiceCore *service){
 	for(uint32_t i = 0; i < (uint32_t) this->m_frameBufferX*this->m_frameBufferY*3; i++) workFrame.push_back(0);
 	this->m_service->pushFrame(workFrame);
 	workFrame.clear();
+	this->m_service->setFrameXY(this->m_frameBufferX, this->m_frameBufferY);
 
 	this->m_screen = rfbGetScreen(0, NULL, this->m_frameBufferX, this->m_frameBufferY, 8, 3, 3);
 	this->m_screen->port = port;
@@ -84,7 +85,7 @@ uint32_t VncServer::serverThread(){
 			std::vector<uint8_t> frame = this->m_service->getFrame(actualFrame);
 			if(frame.size() == (uint32_t) this->m_frameBufferX*this->m_frameBufferY*3){
 				memcpy(this->m_frameBuffer, frame.data(), this->m_frameBufferX*this->m_frameBufferY*3);
-				rfbMarkRectAsModified(this->m_screen, 0, 0, this->m_frameBufferX, this->m_frameBufferY);
+				rfbMarkRectAsModified(this->m_screen, 0, 0, this->m_service->getFrameX(), this->m_service->getFrameY());
 			}
 		}
 	}

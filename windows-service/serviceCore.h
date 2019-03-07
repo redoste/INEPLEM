@@ -45,6 +45,8 @@ class ServiceCore{
 		uint32_t getFramesLen(){ return this->m_frames.size(); };
 		uint16_t getFrameBufferX(){ return this->m_vncServer->getFrameBufferX(); };
 		uint16_t getFrameBufferY(){ return this->m_vncServer->getFrameBufferY(); };
+		uint16_t getFrameX(){ return this->m_frameX; };
+		uint16_t getFrameY(){ return this->m_frameY; };
 		void setAuthtype(uint8_t authtype){
 			this->m_italcAuthtype = authtype;
 			this->m_vncServer->updateSecurityTypes();
@@ -66,6 +68,7 @@ class ServiceCore{
 		void setFramesDelay(uint32_t delay){ this->m_framesDelay = delay; };
 		void lockFrames(){ this->m_framesLock = 1; };
 		void unlockFrames(){ this->m_framesLock = 0; };
+		void setFrameXY(uint16_t x, uint16_t y){ this->m_frameX = x; this->m_frameY = y; };
 	private:
 		HANDLE m_watchdogThread;
 		std::string m_italcUsername;
@@ -78,6 +81,8 @@ class ServiceCore{
 		std::vector<std::vector<uint8_t>> m_frames;
 		uint32_t m_framesDelay;
 		uint8_t m_framesLock;
+		uint16_t m_frameX;
+		uint16_t m_frameY;
 
 		VncServer* m_vncServer;
 		ServiceToUi* m_serviceToUi;
