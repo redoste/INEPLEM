@@ -70,6 +70,8 @@ VncServer::VncServer(uint16_t port, ServiceCore *service){
 uint32_t VncServer::serverThread(){
 	std::cout << "[VncServer] Start serverThread..." << std::endl;
 	uint32_t actualFrame = 0;
+	uint16_t oldFrameX = 0;
+	uint16_t oldFrameY = 0;
 	std::chrono::system_clock::time_point lastFrameTime = std::chrono::system_clock::now();
 	while(this->m_threadContinue){
 		rfbProcessEvents(this->m_screen, this->m_screen->deferUpdateTime * 1000);
@@ -85,7 +87,17 @@ uint32_t VncServer::serverThread(){
 			std::vector<uint8_t> frame = this->m_service->getFrame(actualFrame);
 			if(frame.size() == (uint32_t) this->m_frameBufferX*this->m_frameBufferY*3){
 				memcpy(this->m_frameBuffer, frame.data(), this->m_frameBufferX*this->m_frameBufferY*3);
-				rfbMarkRectAsModified(this->m_screen, 0, 0, this->m_service->getFrameX(), this->m_service->getFrameY());
+				// Si les dimensions de la frame change, i renvois tous l'écran pour éviter les résidus
+				uint16_t newFrameX = this->m_service->getFrameX();
+				uint16_t newFrameY = this->m_service->getFrameY();
+				if(newFrameX != oldFrameX || newFrameY != oldFrameY){
+					oldFrameX = newFrameX;
+					oldFrameY = newFrameY;
+					rfbMarkRectAsModified(this->m_screen, 0, 0, this->m_frameBufferX, this->m_frameBufferY);
+				}
+				else{
+					rfbMarkRectAsModified(this->m_screen, 0, 0, oldFrameX, oldFrameY);
+				}
 			}
 		}
 	}

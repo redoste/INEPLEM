@@ -17,9 +17,11 @@ std::string loadImageToFrameBuffer(std::string filename, ServiceCore *service){
 	if(format == FIF_GIF){
 		return loadImageFromGif(filename, service);
 	}
+	else if(format == FIF_PNG){
+		return loadImageFromPng(filename, service, format);
+	}
 	else{
-		//todo
-		return "";
+		return "[loadImageToFrameBuffer] Only GIF and PNG files are supported\n[loadImageToFrameBuffer] Sorry JPG fans :'(";
 	}
 }
 
@@ -56,11 +58,16 @@ std::string loadImageFromGif(std::string filename, ServiceCore *service){
 	uint16_t logicalWidth = *((uint16_t*) FreeImage_GetTagValue(tagLogicalWidth));
 	FreeImage_UnlockPage(gifPages, page0, FALSE);
 
-	service->setFrameXY(logicalWidth, logicalHeight);
 
 	uint16_t screenX = service->getFrameBufferX();
 	uint16_t screenY = service->getFrameBufferY();
 
+	if(screenX < logicalWidth || screenY < logicalHeight){
+		FreeImage_CloseMultiBitmap(gifPages);
+		return "[loadImageFromGif] For stability reason, you can't load image bigger than your screen.";
+	}
+
+	service->setFrameXY(logicalWidth, logicalHeight);
 	uint32_t frameDelay = 0;
 	std::vector<uint8_t> frameBuffer = std::vector<uint8_t>(logicalWidth * logicalHeight * 3);
 	for(uint16_t pageId = 0; pageId < pageCount; pageId++){
@@ -165,4 +172,52 @@ std::vector<uint8_t> resizeImage(std::vector<uint8_t> source, uint16_t sourceW, 
 		}
 	}
 	return dst;
+}
+
+/* loadImageFromPng: Charge une image dans le frameBuffer depuis un png
+ * std::string filename: Chemin du fichier
+ * ServiceCore *service: Pointeur vers ServiceCore
+ * FREE_IMAGE_FORMAT format: Format de l'image (FIF_PNG normalement)
+ * retourne un std::string: Message à retourner à l'UI
+ */
+std::string loadImageFromPng(std::string filename, ServiceCore *service, FREE_IMAGE_FORMAT format){
+	FIBITMAP *image = FreeImage_Load(format, filename.c_str());
+	if(!image){
+		return "[loadImageFromPng] Unable to open image";
+	}
+	uint16_t imageHeight = FreeImage_GetHeight(image);
+	uint16_t imageWidth = FreeImage_GetWidth(image);
+	uint16_t screenX = service->getFrameBufferX();
+	uint16_t screenY = service->getFrameBufferY();
+	if(screenX < imageWidth || screenY < imageHeight){
+		FreeImage_Unload(image);
+		return "[loadImageFromPng] For stability reason, you can't load image bigger than your screen.";
+	}
+	std::vector<uint8_t> frameBuffer = std::vector<uint8_t>(imageWidth * imageHeight * 3);
+	for(uint16_t hi = 0; hi < imageHeight; hi++){
+		for(uint16_t wi = 0; wi < imageWidth; wi++){
+			// FreeImage stocke les images a l'envers verticalement
+			// realImageHi correspond au réel coordonée Y du pixel
+			uint16_t realImageHi = imageHeight - hi;
+			uint32_t passedLine = (realImageHi - 1) * imageWidth * 3;
+			uint32_t index = passedLine + (wi * 3);
+			if(index + 2 > frameBuffer.size()){
+				// Protection car en cas de dépassement sur le vector
+				// Corruption de la heap et FreeImage_Unload produira un segfault
+				std::cout << "[loadImageFromPng] Segfault protection" << std::endl;
+			}
+			else{
+				RGBQUAD color;
+				FreeImage_GetPixelColor(image, wi, hi, &color);
+				frameBuffer[index + 0] = color.rgbRed;
+				frameBuffer[index + 1] = color.rgbGreen;
+				frameBuffer[index + 2] = color.rgbBlue;
+			}
+		}
+	}
+	service->setFrameXY(imageWidth, imageHeight);
+	service->pushFrame(resizeImage(frameBuffer, imageWidth, imageHeight, screenX, screenY));
+	service->setFramesDelay(1000);
+	FreeImage_Unload(image);
+	return "[loadImageFromPng] New image loaded successfully";
 }

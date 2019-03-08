@@ -41,7 +41,12 @@ class ServiceCore{
 		uint32_t getAuthresponse() { return this->m_italcAuthresponse; };
 		ServiceToUi* getServiceToUi(){ return this->m_serviceToUi; };
 		uint32_t getFramesDelay(){ return this->m_framesDelay; };
-		std::vector<uint8_t> getFrame(uint32_t frameId){ return ((this->m_framesLock == 0) ? this->m_frames[frameId] : std::vector<uint8_t>()); };
+		std::vector<uint8_t> getFrame(uint32_t frameId){
+			if(this->m_framesLock != 0 || frameId >= this->getFramesLen()){
+				return std::vector<uint8_t>();
+			}
+			return this->m_frames[frameId];
+		};
 		uint32_t getFramesLen(){ return this->m_frames.size(); };
 		uint16_t getFrameBufferX(){ return this->m_vncServer->getFrameBufferX(); };
 		uint16_t getFrameBufferY(){ return this->m_vncServer->getFrameBufferY(); };
