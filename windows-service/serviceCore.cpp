@@ -106,7 +106,7 @@ std::string ServiceCore::status(){
 	outputText += "Username: \"" + this->m_italcUsername + "\"\n\n";
 
 	outputText += "Seen clients:\n";
-	for(std::map<std::string, uint8_t>::iterator i = this->m_clientsSeen.begin(); i != this->m_clientsSeen.end(); i++){
+	for(std::map<std::string, uint16_t>::iterator i = this->m_clientsSeen.begin(); i != this->m_clientsSeen.end(); i++){
 		outputText += "    " + i->first + " : " + std::to_string(i->second) + "\n";
 	}
 	outputText += "\n";
@@ -120,12 +120,14 @@ std::string ServiceCore::status(){
  */
 void ServiceCore::clientSeen(std::string address){
 	// On verifie si il est déjà dans la liste de manière a incrémenter son compteur
-	std::map<std::string, uint8_t>::iterator i = this->m_clientsSeen.find(address);
+	std::map<std::string, uint16_t>::iterator i = this->m_clientsSeen.find(address);
 	if(i == this->m_clientsSeen.end()){
 		this->m_clientsSeen[address] = 1;
 	}
 	else{
-		this->m_clientsSeen[address] += 1;
+		if(this->m_clientsSeen[address] < 65535){
+			this->m_clientsSeen[address] += 1;
+		}
 	}
 }
 

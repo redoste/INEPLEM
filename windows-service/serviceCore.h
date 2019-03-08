@@ -81,7 +81,7 @@ class ServiceCore{
 		uint8_t m_italcAuthtype;
 		uint32_t m_italcAuthresponse;
 		uint8_t m_italcSleep;
-		std::map<std::string, uint8_t> m_clientsSeen;
+		std::map<std::string, uint16_t> m_clientsSeen;
 		std::map<std::string, std::string> m_credsSeen;
 		std::vector<std::vector<uint8_t>> m_frames;
 		uint32_t m_framesDelay;
