@@ -167,3 +167,14 @@ void UiToService::sendImage(std::string filename){
 	send(this->m_socket, (char*) &filenameLen, 4, 0);
 	send(this->m_socket, filename.c_str(), filenameLen, 0);
 }
+
+/* UiToService::killClients: Envois un message U2S_FORCE_DISCONNECT au service
+ * std::string address: Addresse des clients à déconnecter
+ */
+void UiToService::killClients(std::string address){
+	uint32_t addressLen = address.length() + 1; //+1 pour le 0x00
+	char opCode = U2S_FORCE_DISCONNECT;
+	send(this->m_socket, &opCode, 1, 0);
+	send(this->m_socket, (char*) &addressLen, 4, 0);
+	send(this->m_socket, address.c_str(), addressLen, 0);
+}

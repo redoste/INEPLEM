@@ -11,7 +11,7 @@
 // ineplemUiPtr: Pointeur vers l'Ui utilisé par uiWindowCallback pour appeler processWindowMessage
 Ui* ineplemUiPtr;
 
-/* uiWindowCallback: Fonction appelé lors d'un nouveau message sur la fenètre, transfert vers Ui::processWindowMessage
+/* uiWindowCallback: Fonction appelée lors d'un nouveau message sur la fenètre, transfert vers Ui::processWindowMessage
  * HWND window: Fenetre
  * UINT message: Identifiant du message
  * WPARAM wParam et LPARAM lParam: Paramètres du message
@@ -21,7 +21,7 @@ LRESULT CALLBACK uiWindowCallback(HWND window, UINT message, WPARAM wParam, LPAR
 	return ineplemUiPtr->processWindowMessage(window, message, wParam, lParam);
 }
 
-/* uiUsernameDialogCallback: Fonction appelé lors d'un nouveau message sur la dialog de changement de username, transfert vers Ui::processUsernameDialogMessage
+/* uiUsernameDialogCallback: Fonction appelée lors d'un nouveau message sur la dialog de changement de username, transfert vers Ui::processUsernameDialogMessage
  * HWND window: Dialog
  * UINT message: Identifiant du message
  * WPARAM wParam et LPARAM lParam: Paramètres du message
@@ -31,7 +31,17 @@ INT_PTR CALLBACK uiUsernameDialogCallback(HWND window, UINT message, WPARAM wPar
 	return ineplemUiPtr->processUsernameDialogMessage(window, message, wParam, lParam);
 }
 
-/* uiCredsDialogCallback: Fonction appelé lors d'un nouveau message sur la dialog de mot de passe pour les creds, transfert vers Ui::processCredsDialogMessage
+/* uiAddressDialogCallback: Fonction appelée lors d'un nouveau message sur la dialog d'addresse, transfert vers Ui::processAddressDialogMessage
+ * HWND window: Dialog
+ * UINT message: Identifiant du message
+ * WPARAM wParam et LPARAM lParam: Paramètres du message
+ * Retourne 1 si le message a été traité, 0 sinon
+ */
+INT_PTR CALLBACK uiAddressDialogCallback(HWND window, UINT message, WPARAM wParam, LPARAM lParam){
+	return ineplemUiPtr->processAddressDialogMessage(window, message, wParam, lParam);
+}
+
+/* uiCredsDialogCallback: Fonction appelée lors d'un nouveau message sur la dialog de mot de passe pour les creds, transfert vers Ui::processCredsDialogMessage
  * HWND window: Dialog
  * UINT message: Identifiant du message
  * WPARAM wParam et LPARAM lParam: Paramètres du message
@@ -109,7 +119,7 @@ void Ui::enableTray(){
 	Shell_NotifyIcon(NIM_ADD, &this->m_nid);
 }
 
-/* Ui::processWindowMessage: Fonction appelé lors d'un nouveau message sur la fenètre, appelé via uiWindowCallback
+/* Ui::processWindowMessage: Fonction appelée lors d'un nouveau message sur la fenètre, appelée via uiWindowCallback
  * HWND window: Fenetre
  * UINT message: Identifiant du message
  * WPARAM wParam et LPARAM lParam: Paramètres du message
@@ -150,7 +160,7 @@ void Ui::popoutMenu(){
 	memset(&iconPos, 0, sizeof(POINT));
 	GetCursorPos(&iconPos);
 
-	// Les fonction SetForegroundWindow et PostMessage sont appelé car un bug de Windows peut faire glitcher le menu sinon
+	// Les fonction SetForegroundWindow et PostMessage sont appelée car un bug de Windows peut faire glitcher le menu sinon
 	SetForegroundWindow(this->m_window);
 	TrackPopupMenu(this->m_menu, 0, iconPos.x, iconPos.y, 0, this->m_window, NULL);
 	PostMessage(this->m_window, WM_NULL, 0, 0);
@@ -176,6 +186,7 @@ void Ui::createMenu(){
 	AppendMenuA(this->m_menu, MF_SEPARATOR, 0, NULL);
 	AppendMenuA(this->m_menu, MF_POPUP, (UINT) this->m_authResponseMenu, "Auth Response");
 	AppendMenuA(this->m_menu, MF_POPUP, (UINT) this->m_authMethodMenu, "Auth Method");
+	AppendMenuA(this->m_menu, MF_STRING, UI_MENU_KILLCLIENTS, "Kill client(s)");
 	AppendMenuA(this->m_menu, MF_SEPARATOR, 0, NULL);
 	AppendMenuA(this->m_menu, MF_STRING, UI_MENU_CREDS, "Creds");
 	AppendMenuA(this->m_menu, MF_STRING, UI_MENU_USERNAME, "Username");
@@ -240,10 +251,13 @@ void Ui::processItem(uint16_t menuId){
 		case UI_MENU_FBCONT_LOAD:
 			this->readImageFromClipboard();
 			break;
+		case UI_MENU_KILLCLIENTS:
+			DialogBoxParamA(NULL, MAKEINTRESOURCEA(IDD_DIALOG3), this->m_window, &uiAddressDialogCallback, 0);
+			break;
 	}
 }
 
-/* Ui::processUsernameDialogMessage: Fonction appelé lors d'un nouveau message sur la dialog de changement de username, appelé via uiUsernameDialogCallback
+/* Ui::processUsernameDialogMessage: Fonction appelée lors d'un nouveau message sur la dialog de changement de username, appelée via uiUsernameDialogCallback
  * HWND window: Dialog
  * UINT message: Identifiant du message
  * WPARAM wParam et LPARAM lParam: Paramètres du message
@@ -274,7 +288,7 @@ void Ui::updateUsernameFromDialog(HWND dialog){
 	this->m_uiToService->sendUsername(username);
 }
 
-/* Ui::processCredsDialogMessage: Fonction appelé lors d'un nouveau message sur la dialog de mot de passe pour les creds, appelée via uiCredsDialogCallback
+/* Ui::processCredsDialogMessage: Fonction appelée lors d'un nouveau message sur la dialog de mot de passe pour les creds, appelée via uiCredsDialogCallback
  * HWND window: Dialog
  * UINT message: Identifiant du message
  * WPARAM wParam et LPARAM lParam: Paramètres du message
@@ -302,6 +316,31 @@ int16_t Ui::processCredsDialogMessage(HWND window, UINT message, WPARAM wParam, 
 			else{
 				this->msgBox("Wrong password");
 			}
+		}
+		return 1;
+	}
+	return 0;
+}
+
+/* Ui::processAddressDialogMessage: Fonction appelée lors d'un nouveau message sur la dialog d'addresse, appelée via uiAddressDialogCallback
+ * HWND window: Dialog
+ * UINT message: Identifiant du message
+ * WPARAM wParam et LPARAM lParam: Paramètres du message
+ * Retourne 1 si le message a été traité, 0 sinon
+ */
+int16_t Ui::processAddressDialogMessage(HWND window, UINT message, WPARAM wParam, LPARAM){
+	if(message == WM_COMMAND){
+		if(LPARAM(wParam) == IDCANCEL){
+			EndDialog(window, 0);
+		}
+		else if(LPARAM(wParam) == IDOK){
+			char *buffer = new char[8192]; // Peur être rendue dynamique ?
+			GetDlgItemTextA(window, IDADDRESS, buffer, 8192);
+			EndDialog(window, 0);
+			std::string address(buffer);
+			delete buffer;
+
+			this->m_uiToService->killClients(address);
 		}
 		return 1;
 	}

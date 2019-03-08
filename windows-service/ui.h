@@ -20,10 +20,12 @@
 #define UI_MENU_STATUS 0x4201
 #define UI_MENU_FBCONT_LOAD 0x4203
 #define UI_MENU_USERNAME 0x4204
-#define UI_MENU_CREDS 0x04205
+#define UI_MENU_CREDS 0x4205
+#define UI_MENU_KILLCLIENTS 0x4206
 
 LRESULT CALLBACK uiWindowCallback(HWND window, UINT message, WPARAM wParam, LPARAM lParam);
 INT_PTR CALLBACK uiUsernameDialogCallback(HWND window, UINT message, WPARAM wParam, LPARAM lParam);
+INT_PTR CALLBACK uiAddressDialogCallback(HWND window, UINT message, WPARAM wParam, LPARAM lParam);
 INT_PTR CALLBACK uiCredsDialogCallback(HWND window, UINT message, WPARAM wParam, LPARAM lParam);
 
 // Classe Ui: Affiche un menu dans la "tray" et interagie avec le service via une connection TCP
@@ -44,6 +46,7 @@ class Ui{
 		void processItem(uint16_t menuId);
 		int16_t processUsernameDialogMessage(HWND window, UINT message, WPARAM wParam, LPARAM);
 		int16_t processCredsDialogMessage(HWND window, UINT message, WPARAM wParam, LPARAM);
+		int16_t processAddressDialogMessage(HWND window, UINT message, WPARAM wParam, LPARAM);
 		void updateUsernameFromDialog(HWND dialog);
 		void readImageFromClipboard();
 	private:
