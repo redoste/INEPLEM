@@ -37,16 +37,10 @@ VncServer::VncServer(uint16_t port, ServiceCore *service){
 	this->m_frameBuffer = new char[this->m_frameBufferX*this->m_frameBufferY*3];
 	memset(this->m_frameBuffer, 0, this->m_frameBufferX*this->m_frameBufferY*3);
 
-	// On upload un pattern de test, une frame blanche et une frame noire a 1 sec d'intervale
+	// On met une frame vide
 	this->m_service->framesClear();
 	this->m_service->setFramesDelay(1000);
-	std::vector<uint8_t> workFrame;
-	for(uint32_t i = 0; i < (uint32_t) this->m_frameBufferX*this->m_frameBufferY*3; i++) workFrame.push_back(255);
-	this->m_service->pushFrame(workFrame);
-	workFrame.clear();
-	for(uint32_t i = 0; i < (uint32_t) this->m_frameBufferX*this->m_frameBufferY*3; i++) workFrame.push_back(0);
-	this->m_service->pushFrame(workFrame);
-	workFrame.clear();
+	this->m_service->pushFrame(std::vector<uint8_t>((this->m_frameBufferX*this->m_frameBufferY*3)));
 	this->m_service->setFrameXY(this->m_frameBufferX, this->m_frameBufferY);
 
 	this->m_screen = rfbGetScreen(0, NULL, this->m_frameBufferX, this->m_frameBufferY, 8, 3, 3);
