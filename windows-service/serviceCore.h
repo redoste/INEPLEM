@@ -74,6 +74,7 @@ class ServiceCore{
 		void lockFrames(){ this->m_framesLock = 1; };
 		void unlockFrames(){ this->m_framesLock = 0; };
 		void setFrameXY(uint16_t x, uint16_t y){ this->m_frameX = x; this->m_frameY = y; };
+		std::string killClients(std::string address){ return this->m_vncServer->killClients(address); };
 	private:
 		HANDLE m_watchdogThread;
 		std::string m_italcUsername;

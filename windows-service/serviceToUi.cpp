@@ -160,6 +160,18 @@ uint32_t ServiceToUi::clientThread(SOCKET socket){
 		else if(recivedByte == U2S_FRAMES){
 			this->processNewFrames(socket);
 		}
+		else if(recivedByte == U2S_FORCE_DISCONNECT){
+			// Déconnecte tous les clients à une addresse spécifique
+			uint32_t stringLen;
+			recv(socket, (char*) &stringLen, 4, 0);
+			char *addressCStr = new char[stringLen];
+			recv(socket, addressCStr, stringLen, 0);
+			std::string address(addressCStr);
+			delete addressCStr;
+
+			std::string response = this->m_service->killClients(address);
+			this->broadcastNotification(response);
+		}
 	}
 
 	// On supprime notre socket du vector m_clientSockets

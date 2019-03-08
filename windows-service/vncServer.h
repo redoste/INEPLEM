@@ -19,6 +19,7 @@ class VncServer{
 		void updateSecurityTypes();
 		void tryToUnregister(rfbSecurityHandler **toUnregister);
 		void updateUsername();
+		std::string killClients(std::string address);
 
 		uint16_t getFrameBufferX(){ return this->m_frameBufferX; };
 		uint16_t getFrameBufferY(){ return this->m_frameBufferY; };

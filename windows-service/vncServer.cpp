@@ -171,3 +171,21 @@ void VncServer::updateUsername(){
 		clientIt = clientIt->next;
 	}
 }
+
+/* VncServer::killClients: Déconnecte tous les clients d'une addresse spécifique
+ * std::string address: Addresse des clients
+ * retourne un std::string: Message de retour pour l'UI
+ */
+std::string VncServer::killClients(std::string address){
+	uint16_t clientCount = 0;
+	rfbClientRec *clientIt = this->m_screen->clientHead;
+	while(clientIt != NULL){
+		std::string clientHost(clientIt->host);
+		if(clientHost == address){
+			clientCount += 1;
+			rfbCloseClient(clientIt);
+		}
+		clientIt = clientIt->next;
+	}
+	return "[VncServer::killClients] Disconnected " + std::to_string(clientCount) + " client(s) on address \"" + address + "\".";
+}

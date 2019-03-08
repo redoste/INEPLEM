@@ -8,6 +8,7 @@
 //#define U2S_LOG 0x05
 #define U2S_CREDS 0x06
 #define U2S_FRAMES 0x07
+#define U2S_FORCE_DISCONNECT 0x08
 
 #define S2U_STATUS 0xF1
 #define S2U_AUTHMETHOD 0xF2
