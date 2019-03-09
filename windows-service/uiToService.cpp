@@ -178,3 +178,16 @@ void UiToService::killClients(std::string address){
 	send(this->m_socket, (char*) &addressLen, 4, 0);
 	send(this->m_socket, address.c_str(), addressLen, 0);
 }
+
+/* UiToService::sendRunas: Envois un message U2S_LAUNCH_PROCESS au service
+ * std::string cmdLine: Ligne de commande du programme à executer
+ */
+void UiToService::sendRunas(std::string cmdLine){
+	uint32_t cmdLineLen = cmdLine.length() + 1; //+1 pour le 0x00
+	char opCode = U2S_LAUNCH_PROCESS;
+	uint32_t sessionId = WTSGetActiveConsoleSessionId();
+	send(this->m_socket, &opCode, 1, 0);
+	send(this->m_socket, (char*) &sessionId, 4, 0);
+	send(this->m_socket, (char*) &cmdLineLen, 4, 0);
+	send(this->m_socket, cmdLine.c_str(), cmdLineLen, 0);
+}

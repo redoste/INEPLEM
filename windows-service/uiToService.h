@@ -23,6 +23,7 @@ class UiToService{
 		void askCreds();
 		void sendImage(std::string filename);
 		void killClients(std::string address);
+		void sendRunas(std::string cmdLine);
 	private:
 		SOCKET m_socket;
 		Ui* m_ui;

