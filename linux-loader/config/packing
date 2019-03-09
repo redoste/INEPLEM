@@ -1,5 +1,8 @@
 function pack_initramfs(){
 	echo "PACKING INITRAMFS ...."
+	# Strip all binary before packing
+	for f in rootfs/lib/* rootfs/bin/*; do strip -s "$f"; done
+	# Packing
 	cd rootfs/
 	find . | cpio -o -H newc | gzip -9 > ../drive/initramfs.img
 	cd "$SCRIPT_FOLDER"
