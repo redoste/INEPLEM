@@ -32,7 +32,7 @@ function busybox_build(){
 function busybox_install(){
 	echo "INSTALLING BUSYBOX ...."
 	mkdir -p rootfs/bin/
-	mkdir -p rootfs/dev/ rootfs/mnt/ rootfs/proc/ rootfs/sys/
+	mkdir -p rootfs/dev/ rootfs/mnt/ rootfs/proc/ rootfs/sys/ rootfs/share/
 	cp $busybox_source/_install/bin/busybox rootfs/bin/
 	echo "INSTALLING BUSYBOX DONE"
 }
