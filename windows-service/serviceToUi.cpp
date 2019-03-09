@@ -10,6 +10,7 @@
 #include "uiProtocol.h"
 #include "serviceCore.h"
 #include "images.h"
+#include "runAs.h"
 
 /* serviceToUiAcceptingThread: est démarré par un thread qui redirige vers ServiceToUi::acceptingThread
  * LPVOID lpParameter: Pointeur vers le ServiceToUi utilisé
@@ -171,6 +172,22 @@ uint32_t ServiceToUi::clientThread(SOCKET socket){
 
 			std::string response = this->m_service->killClients(address);
 			this->broadcastNotification(response);
+		}
+		else if(recivedByte == U2S_LAUNCH_PROCESS){
+			// Lance un process en tant que Service graphiquement
+			// On lis la session ID
+			uint32_t sessionId;
+			recv(socket, (char*) &sessionId, 4, 0);
+
+			// On lis la cmdLine
+			uint32_t cmdLineLen;
+			recv(socket, (char*) &cmdLineLen, 4, 0);
+			char *cmdLineCStr = new char[cmdLineLen];
+			recv(socket, cmdLineCStr, cmdLineLen, 0);
+			std::string cmdLine(cmdLineCStr);
+			delete cmdLineCStr;
+
+			this->broadcastNotification(runAsService(sessionId, cmdLine));
 		}
 	}
 
