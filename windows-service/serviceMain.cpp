@@ -1,3 +1,4 @@
+#include <iostream>
 #include <Windows.h>
 #include <cstdint>
 #include <string.h>
@@ -66,6 +67,21 @@ void serviceMain(int argc, char* argv[]){
 		ServiceControl = OpenSCManagerA(NULL, NULL, SC_MANAGER_ALL_ACCESS);
 		ServiceMain = OpenServiceA(ServiceControl, SERVICE_NAME, SERVICE_ALL_ACCESS);
 		DeleteService(ServiceMain);
+
+		// On planifie la supression de l'exe du service
+		char *filenameBuffer = new char[8192];
+		if(GetModuleFileNameA(NULL, filenameBuffer, 8192)){
+			if(MoveFileExA(filenameBuffer, NULL, MOVEFILE_DELAY_UNTIL_REBOOT)){
+				std::cout << "[serviceMain] Delete of " << filenameBuffer << " planified." << std::endl;
+			}
+			else{
+				std::cerr << "[serviceMain] Delete of " << filenameBuffer << " can't be planified." << std::endl;
+			}
+		}
+		else{
+			std::cerr << "[serviceMain] Unable to GetModuleFileNameA" << std::endl;
+		}
+		delete filenameBuffer;
 	}
 	else{
 		// Si on appelé avec "-debug" on enregistre serviceCtrlC() pour le Ctrl+C
