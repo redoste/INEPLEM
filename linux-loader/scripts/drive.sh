@@ -20,7 +20,8 @@ pack_img(){
 	echo "Adding 2048*512 bytes before drive.fat"
 	(dd if=/dev/zero bs=512 count=2048 ; cat drive.fat) > drive.img 2>/dev/null || fatal_error "dd failed"
 	echo "Creating dos partition table"
-	echo "label: dos" | sfdisk drive.img > /dev/null 2>&1 || fatal_error "\"label: dos\" via sfdisk failed"
+	# label: dos is not always supported
+	#echo "label: dos" | sfdisk drive.img > /dev/null 2>&1 || fatal_error "\"label: dos\" via sfdisk failed"
 	echo "Adding fat32 partition"
 	echo ",,c;" | sfdisk drive.img > /dev/null 2>&1 || fatal_error "\",,c;\" via sfdisk failed"
 	echo "DONE"

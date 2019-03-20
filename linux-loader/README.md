@@ -30,6 +30,7 @@ The version and download URL of the required kernel can be found in the `scripts
 Here is a quick example of how to use it
 ```bash
 . scripts/linux.sh
+mkdir downloads/
 cd downloads/
 curl -O $INEPLEM_LINUX_URI
 tar xvf linux-$INEPLEM_LINUX_VERSION.tar.gz
@@ -37,7 +38,7 @@ tar xvf linux-$INEPLEM_LINUX_VERSION.tar.gz
 Then simply apply the configuration and start the build
 ```bash
 cd linux-$INEPLEM_LINUX_VERSION
-cp ../../config/linux.defconfig arch/x86/ineplem_defconfig
+cp ../../config/linux.defconfig arch/x86/configs/ineplem_defconfig
 make ARCH=x86 ineplem_defconfig
 make bzImage -j 4 # Replace 4 with the number of threads you want
 ```

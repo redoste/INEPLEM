@@ -36,7 +36,4 @@ check_sha256(){
 	fi
 }
 
-if [ "$_" = "$0" ]; then
-	fatal_error "This is script is not supposed to be called"
-fi
 check_dependecies
