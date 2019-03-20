@@ -1,42 +1,27 @@
 INEPLEM
 =======
 
-**INEPLEM** (Italc Ne sEra PLus dE ce Monde) est un service Windows temporaire remplaçant **icas** (Italc Client Service) et installable via un périphérique bootable.
-Il est composé de deux grandes parties :
-* Le service Windows, développé en C++ à l'aide de l'API Windows native. (`Windows.h`)
-* La minuscule *distribution* (si on peut l'appeler comme ca) Linux, basé sur Alpine Linux, fournis avec les scripts d'instalation du service
+**INEPLEM** for *Italc Ne sEra PLus dE ce Monde* (Yes, I know this is not a valid acronym...) which means in French *iTalc will no longer be of this world* is a temporary Windows service installable on the student's computer to exploit the teacher's iTalc.
+This repository is mainly in French but translation will be done progressively.
 
-Pour la compilation du windows-service
---------------------------------------
+Features
+--------
 
-* Configuration d'example pour libvncserver
-`cmake.exe ../libvncserver-LibVNCServer-0.9.12/ -G "MSYS Makefiles" -D CMAKE_C_FLAGS="${CMAKE_C_FLAGS} -DWINVER=0x0501 -D_WIN32_WINNT=0x0501"`
-Avec msys, mingw et cmake dans le path (un rollback de mingw32-w32api à la 5.0.1 peut être nécésaire)
+- Installs Windows service via bootable Alpine Linux drive to bypass Administrator requirement
+- Keep iTalc student service closed
+- Broadcasts custom image to teacher's iTalc (PNG or GIF)
+- Minimal support of animated GIF
+- Broadcasts custom username to teacher's iTalc
+- *Ghost mode* for looking like a turned off computer
+- Windows Firewall bypass
+- Prevent remote access
+- Captures teacher's credentials when ACL authentification is used
+- Automatic cleaning at computer shutdown
+- Allows launching custom processes as `NT AUTHORITY\SYSTEM`
+- Free spelling errors, grammar errors, etc. (in French and in English)
 
-* Patch pour la libvncserver:
+Building
+--------
 
-rfb.h: Ligne 57, commenter `//typedef UINT32 in_addr_t;`
-
-auth.c: Ligne 302, commenter
-
-```
-/*if (!cl->screen->authPasswdData || cl->reverseConnection) {
-	/* chk if this condition is valid or not.
-	securityType = rfbSecTypeNone;
-} else if (cl->screen->authPasswdData) {
-    securityType = rfbSecTypeVncAuth;
-}*/
-```
-
-et ligne 213, commenter
-
-```
-/*switch (primaryType) {
-case rfbSecTypeNone:
-    rfbRegisterSecurityHandler(&VncSecurityHandlerNone);
-    break;
-case rfbSecTypeVncAuth:
-    rfbRegisterSecurityHandler(&VncSecurityHandlerVncAuth);
-    break;
-}*/
-```
+For building INEPLEM you need to build the `windows-service` before the `linux-loader`.
+Read the `README.md` file in respective folders to get builds instructions.
