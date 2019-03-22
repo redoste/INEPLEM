@@ -1,7 +1,7 @@
 INEPLEM
 =======
 
-**INEPLEM** for *Italc Ne sEra PLus dE ce Monde* (Yes, I know this is not a valid acronym...) which means in French *iTalc will no longer be of this world* is a temporary Windows service installable on the student's computer to exploit the teacher's iTalc.
+**INEPLEM** ([pronunciation](https://youtu.be/0SUpiyMKszE)) for *Italc Ne sEra PLus dE ce Monde* (Yes, I know this is not a valid acronym...) which means in French *iTalc will no longer be of this world* is a temporary Windows service installable on the student's computer to exploit the teacher's iTalc.
 This repository is mainly in French but translation will be done progressively.
 
 Features
