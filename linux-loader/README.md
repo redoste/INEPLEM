@@ -1,6 +1,12 @@
 linux-loader building documentation
 ===================================
 
+Warnings About EFI
+------------------
+
+* Secure Boot is not and will never be supported
+* Syslinux doesn't have a perfect EFI support and on a lot of EFI, it just doesn't work so prefer using Legacy Boot when you can
+
 Commands
 --------
 
